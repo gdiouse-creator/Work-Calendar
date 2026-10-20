@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>工作分類分配行事曆</title>
+<title>狂工曆</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMTIiIGZpbGw9IiMyZTNhMzQiLz4KPHBvbHlnb24gcG9pbnRzPSIyNTYsODggMzQ0LDE3NiAyNTYsMjY0IDE2OCwxNzYiIGZpbGw9IiNmN2Y2ZjIiLz4KPHBvbHlnb24gcG9pbnRzPSIzNDQsMTc2IDQyNCwyNTYgMzQ0LDMzNiAyNjQsMjU2IiBmaWxsPSIjZjdmNmYyIi8+Cjxwb2x5Z29uIHBvaW50cz0iMjU2LDI0OCAzNDQsMzM2IDI1Niw0MjQgMTY4LDMzNiIgZmlsbD0iI2Y3ZjZmMiIvPgo8cG9seWdvbiBwb2ludHM9IjE2OCwxNzYgMjU2LDI2NCAxNjgsMzUyIDg4LDI1NiIgZmlsbD0iI2UwYTg1YSIvPgo8L3N2Zz4=">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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">
 <style>
 :root{--line:#e5e3dc;--bg:#f7f6f2;--ink:#2e3a34;--muted:#8a938e;--accent:#3d7a5f;--fs:14px;--maxw:1120px}
 *{box-sizing:border-box}
@@ -135,6 +137,10 @@ button:hover{border-color:#c9c7bf}
   #print .ptable thead{display:table-header-group}
   #print .ptable tr{break-inside:avoid}
   #print .ptable td{padding:0;vertical-align:top}
+  #print .gpage{break-after:page}
+  #print .gpage:last-child{break-after:auto}
+  #print .gpair{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px}
+  #print .gblock{flex:none;border:1px solid var(--line);border-radius:6px;overflow:hidden}
   #print .ptable tbody tr+tr td{border-top:1px solid var(--line)}
   #print .cell:hover,#print .label:hover,#print .bar:hover{filter:none}
 }
@@ -150,6 +156,35 @@ button:hover{border-color:#c9c7bf}
   .label{isolation:isolate}
   .label::before{content:'';position:absolute;inset:0;background:#fff;z-index:-1}
 }
+.board.gantt{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.g-hrow{display:flex}
+.g-corner{width:120px;flex:none;position:sticky;left:0;z-index:5;background:#fbfaf7;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.g-months{display:flex;flex:none;border-bottom:1px solid var(--line);font-size:calc(var(--fs) - 1px);color:var(--muted);font-weight:600}
+.g-month{flex:none;padding:5px 8px;border-right:1px solid var(--line);white-space:nowrap;overflow:hidden;background:#fbfaf7}
+.g-days{display:flex;flex:none;border-bottom:1px solid var(--line);background:#fff}
+.g-day{flex:none;width:30px;text-align:center;font-size:calc(var(--fs) - 3px);color:var(--muted);padding:4px 0;border-right:1px solid #f0efe9}
+.g-day.we{background:#f6f7f5}
+.g-day.hol{color:#a9b0ac}
+.g-day.today{color:var(--accent);font-weight:700}
+.g-row{display:flex;border-top:1px solid #f0efe9}
+.g-label{width:120px;flex:none;position:sticky;left:0;z-index:4;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;font-weight:600;border-right:1px solid var(--line);cursor:pointer;isolation:isolate;line-height:1.35}
+.g-label::before{content:'';position:absolute;inset:0;background:#fff;z-index:-1}
+.g-label.sub{font-weight:500}
+.g-track{position:relative;flex:none;background:#fff}
+.g-cell{position:absolute;top:0;bottom:0;border-left:1px solid #ffffffa0;padding:0;cursor:cell}
+.g-cell.today{box-shadow:inset 2px 0 0 var(--accent)}
+.g-pfill{position:absolute;left:0;top:0;bottom:0;pointer-events:none;border-radius:4px 0 0 4px}
+.g-txt{position:relative;display:block}
+.g-bar.vert{line-height:1.25;padding:4px 0;text-align:center}
+.g-vert{writing-mode:vertical-rl;display:inline-block;letter-spacing:.08em}
+.g-loc{color:#5d6a64;font-size:calc(var(--fs) - 3px)}
+.g-note-out{position:absolute;z-index:2;font-size:calc(var(--fs) - 2px);line-height:22px;color:#3f4a45;font-weight:400;white-space:normal;padding:0 6px;pointer-events:none}
+.g-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.g-pct{font-weight:700;margin-left:4px}
+.g-note{display:block;font-size:calc(var(--fs) - 2px);color:#3f4a45;white-space:normal;font-weight:400;margin-top:2px}
+.g-rz{position:absolute;right:0;top:0;bottom:0;width:10px;cursor:ew-resize;border-radius:0 5px 5px 0}
+.g-rz:hover{background:rgba(46,58,52,.18)}
+.g-bar{position:absolute;z-index:2;margin:0;height:28px;box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:26px;padding:0 6px;border-left:3px solid;border-radius:5px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -157,7 +192,7 @@ button:hover{border-color:#c9c7bf}
   <div class="credit">製作者楚狂 · <a href="https://leouse.wordpress.com/category/%E5%89%B5%E4%BD%9C/" target="_blank" rel="noopener">更多AI協作效率系統</a></div>
   <div class="top">
     <div class="seg">
-      <button data-view="month">月</button><button data-view="week">週</button><button data-view="year">年</button>
+      <button data-view="month">月</button><button data-view="week">週</button><button data-view="year">年</button><button data-view="gantt">甘特圖</button>
     </div>
     <div class="nav">
       <button id="prev">‹</button>
@@ -186,6 +221,7 @@ button:hover{border-color:#c9c7bf}
     <label>事項<input id="fText" maxlength="120" autocomplete="off"></label>
     <label>地點<input id="fLoc" maxlength="60" autocomplete="off" placeholder="選填"></label>
     <label>備註<textarea id="fNote" rows="2" maxlength="400" placeholder="選填"></textarea></label>
+    <label>進度（0–100，選填）<input type="number" id="fProg" min="0" max="100" step="5" inputmode="numeric" placeholder="未設定"></label>
     <div class="two">
       <label>開始<input type="date" id="fStart"></label>
       <label>結束<input type="date" id="fEnd"></label>
@@ -322,6 +358,7 @@ button:hover{border-color:#c9c7bf}
       <select id="pLayout">
         <option value="continuous">連續</option>
         <option value="paged">每月分頁</option>
+        <option value="gantt">甘特圖</option>
       </select>
     </label>
     <label>備註
@@ -466,6 +503,8 @@ let anchor = new Date();
 let editingId = null;
 let ctxPos = null;
 const closedNotes = new Set();
+const gExpanded = new Set();
+let gClickTimer = null;
 let suppressClick = false, drag = null;
 let rowEdit = null;
 let rowColorSel = PALETTE[0];
@@ -474,7 +513,7 @@ let noteEdit = null;
 
 function periodKey(v, a) {
   if (v === 'year') return 'Y:' + a.getFullYear();
-  if (v === 'month') return 'M:' + monthStr(a);
+  if (v === 'month' || v === 'gantt') return 'M:' + monthStr(a);
   return 'W:' + toISO(mondayOf(a));
 }
 
@@ -578,6 +617,10 @@ function inPeriod(d, v, a) {
 }
 
 function titleFor(v, a) {
+  if (v === 'gantt') {
+    const s0 = new Date(a.getFullYear(), a.getMonth(), 1), e0 = addDays(s0, GANTT_DAYS - 1);
+    return `${s0.getFullYear()} 年 ${s0.getMonth() + 1} 月 – ${e0.getFullYear() === s0.getFullYear() ? '' : e0.getFullYear() + ' 年 '}${e0.getMonth() + 1} 月`;
+  }
   if (v === 'year') return `${a.getFullYear()} 年`;
   if (v === 'month') return `${a.getFullYear()} 年 ${a.getMonth() + 1} 月`;
   const s = mondayOf(a), e = addDays(s, 6);
@@ -710,16 +753,139 @@ function boardInner(weeks, isIn, rows, shown) {
   return head + gridHTML(weeks, isIn, rows, shown) + (rows.length ? '' : '<div class="empty">沒有列</div>');
 }
 
+/* 事件進度：底色填滿已完成的比例，文字後面標出百分比 */
+const progFill = (t, c) => (t.prog == null ? '' : `<span class="g-pfill" style="width:${t.prog}%;background:${c}66"></span>`);
+const progLabel = t => (t.prog == null ? '' : ` <b class="g-pct">${t.prog}%</b>`);
+/* 甘特圖：從所選月份的 1 號起連續 90 天，水平捲動；事件條與日曆格共用同一套點擊、拖曳邏輯 */
+const GANTT_DAYS = 90, GANTT_DW = 30, GANTT_LW = 120;
+function ganttHTML(rows) {
+  const start = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
+  const dates = Array.from({ length: GANTT_DAYS }, (_, i) => addDays(start, i));
+  const from = toISO(dates[0]), to = toISO(dates[GANTT_DAYS - 1]);
+  const idx = iso => Math.round((parse(iso) - start) / DAY_MS);
+  const todayISO = toISO(new Date());
+  const W = GANTT_DAYS * GANTT_DW;
+  let months = '';
+  for (let i = 0; i < GANTT_DAYS;) {
+    const d = dates[i];
+    let j = i;
+    while (j < GANTT_DAYS && dates[j].getMonth() === d.getMonth()) j++;
+    months += `<div class="g-month" style="width:${(j - i) * GANTT_DW}px">${d.getFullYear()} 年 ${d.getMonth() + 1} 月</div>`;
+    i = j;
+  }
+  const dayHead = dates.map(d => {
+    const iso = toISO(d), hol = holidayOf(iso), we = d.getDay() === 0 || d.getDay() === 6;
+    const cls = ['g-day'];
+    if (we) cls.push('we');
+    if (iso === todayISO) cls.push('today');
+    if (hol) cls.push('hol');
+    return `<div class="${cls.join(' ')}"${hol ? ` title="${esc(hol)}"` : ''}>${d.getDate()}</div>`;
+  }).join('');
+  let html = `<div class="g-wrap" style="width:${GANTT_LW + W}px">`;
+  html += `<div class="g-hrow"><div class="g-corner"></div><div class="g-months" style="width:${W}px">${months}</div></div>`;
+  html += `<div class="g-hrow"><div class="g-corner"></div><div class="g-days" style="width:${W}px">${dayHead}</div></div>`;
+  for (const row of rows) {
+    const c = row.color;
+    const segs = data.todos
+      .filter(t => t.rows.includes(row.id) && t.end >= from && t.start <= to)
+      .map(t => ({ t, cs: idx(t.start > from ? t.start : from), ce: idx(t.end < to ? t.end : to) + 1 }))
+      .sort((a, b) => a.cs - b.cs || b.ce - a.ce);
+    const lanesEnd = [];
+    segs.forEach(sg => {
+      let l = lanesEnd.findIndex(x => x <= sg.cs);
+      if (l < 0) { l = lanesEnd.length; lanesEnd.push(0); }
+      lanesEnd[l] = sg.ce;
+      sg.lane = l;
+    });
+    /* 收合時只顯示前三個字（窄條直排）；展開時在條下方浮出完整文字與備註。條寬永遠等於日期跨度。 */
+    const EXP_MIN_W = 160;
+    segs.forEach(sg => {
+      sg.expanded = gExpanded.has(sg.t.id);
+      sg.wpx = (sg.ce - sg.cs) * GANTT_DW - 4;
+      sg.vert = sg.wpx < 44;
+      sg.barH = sg.vert ? 64 : 28;
+      sg.nw = Math.min(Math.max(sg.wpx, EXP_MIN_W), GANTT_DAYS * GANTT_DW - (sg.cs * GANTT_DW + 2));
+    });
+    const laneN = Math.max(1, lanesEnd.length);
+    const laneH = Array(laneN).fill(34);
+    segs.forEach(sg => {
+      if (sg.vert) laneH[sg.lane] = Math.max(laneH[sg.lane], 72);
+      if (!sg.expanded) return;
+      const cols = Math.max(4, Math.floor((sg.nw - 12) / 13));
+      const text = `${sg.t.st ? sg.t.st + ' ' : ''}${sg.t.text}${sg.t.loc ? '\n' + sg.t.loc : ''}`;
+      const lines = text.split('\n').reduce((a, ln) => a + Math.max(1, Math.ceil(ln.length / cols)), 0);
+      laneH[sg.lane] = Math.max(laneH[sg.lane], 4 + sg.barH + 4 + 22 * lines + 8);
+    });
+    const laneTop = [];
+    laneH.reduce((acc, hh, i) => { laneTop[i] = acc; return acc + hh; }, 0);
+    const h = laneH.reduce((a, b) => a + b, 0) + 8;
+    const cells = dates.map((d, k) => {
+      const iso = toISO(d), we = d.getDay() === 0 || d.getDay() === 6;
+      const cls = ['cell', 'g-cell'];
+      if (iso === todayISO) cls.push('today');
+      const shade = holidayOf(iso) ? '3a' : (we ? '26' : '12');
+      return `<div class="${cls.join(' ')}" data-row="${row.id}" data-date="${iso}" style="left:${k * GANTT_DW}px;width:${GANTT_DW}px;background:${c}${shade}"></div>`;
+    }).join('');
+    const bars = segs.map(({ t, cs, ce, lane, wpx, vert, expanded, nw, barH }) => {
+      const left = cs * GANTT_DW + 2;
+      const top = laneTop[lane] + 4;
+      const head = [...t.text].slice(0, 3).join('');
+      const label = vert ? `<span class="g-vert">${esc(head)}</span>` : `<span class="g-title">${esc(head)}</span>`;
+      const bar = `<div class="bar g-bar${vert ? ' vert' : ''}" data-todo="${t.id}" style="left:${left}px;width:${wpx}px;top:${top}px;height:${barH}px;background:${c}59;border-left-color:${c}" title="${esc(t.text + (t.loc ? ' · ' + t.loc : ''))}">${progFill(t, c)}<span class="g-txt">${label}</span><span class="g-rz" title="拖曳調整結束日"></span></div>`;
+      if (!expanded) return bar;
+      const note = `<div class="g-note-out" data-nl="${left}" data-nw="${nw}" style="left:${left}px;width:${nw}px;top:${top + barH + 2}px"><b>${t.st ? esc(t.st) + ' ' : ''}${esc(t.text)}</b>${progLabel(t)}${t.loc ? `<br><span class="g-loc">${esc(t.loc)}</span>` : ''}</div>`;
+      return bar + note;
+    }).join('');
+    html += `<div class="g-row"><div class="g-label${row.depth ? ' sub' : ''}" data-rowedit="${row.id}" style="background:${c}30;padding-left:${6 + row.depth * 8}px">${esc(row.name)}</div><div class="g-track" style="width:${W}px;height:${h}px">${cells}${bars}</div></div>`;
+  }
+  if (!rows.length) html += '<div class="empty">沒有列</div>';
+  return html + '</div>';
+}
+
+/* 橫向捲動時，列名欄會蓋住事件條左側，文字依可見範圍往右推 */
+function alignGanttText() {
+  const board = $('board');
+  board.querySelectorAll('.g-note-out').forEach(el => {
+    const left = parseFloat(el.dataset.nl) || 0;
+    const w = parseFloat(el.dataset.nw) || 0;
+    const off = Math.max(0, Math.min(board.scrollLeft - left, w - 120));
+    el.style.left = (left + off) + 'px';
+    el.style.width = (w - off) + 'px';
+  });
+  board.querySelectorAll('.g-bar:not(.vert)').forEach(bar => {
+    const txt = bar.querySelector('.g-txt');
+    if (!txt) return;
+    const left = parseFloat(bar.style.left) || 0;
+    const w = parseFloat(bar.style.width) || 0;
+    const hidden = board.scrollLeft - left;
+    const off = Math.max(0, Math.min(hidden, w - 120));
+    txt.style.marginLeft = off ? `${off}px` : '';
+  });
+}
+let ganttScrollBound = false;
+function bindGanttScroll() {
+  if (ganttScrollBound) return;
+  ganttScrollBound = true;
+  $('board').addEventListener('scroll', () => { if (view === 'gantt') alignGanttText(); }, { passive: true });
+}
+
 function render() {
   $('title').textContent = titleFor(view, anchor);
-  $('board').innerHTML = boardInner(weeksFor(view, anchor), d => inPeriod(d, view, anchor), flatRows(false), new Set());
+  if (view === 'gantt') {
+    $('board').classList.add('gantt');
+    $('board').innerHTML = ganttHTML(flatRows(false));
+    alignGanttText();
+  } else {
+    $('board').classList.remove('gantt');
+    $('board').innerHTML = boardInner(weeksFor(view, anchor), d => inPeriod(d, view, anchor), flatRows(false), new Set());
+  }
   $('notePeriod').innerHTML = data.notes.filter(n => n.scope === 'period' && n.target === periodKey(view, anchor)).map(noteHTML).join('');
   $('noteAll').innerHTML = data.notes.filter(n => n.scope === 'all').map(noteHTML).join('');
   document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === view));
 }
 
 function step(dir) {
-  if (view === 'month') anchor = new Date(anchor.getFullYear(), anchor.getMonth() + dir, 1);
+  if (view === 'month' || view === 'gantt') anchor = new Date(anchor.getFullYear(), anchor.getMonth() + dir, 1);
   else if (view === 'year') anchor = new Date(anchor.getFullYear() + dir, 0, 1);
   else anchor = addDays(anchor, 7 * dir);
   render();
@@ -759,6 +925,7 @@ function openDlg(todo, pos) {
   $('fText').value = t.text;
   $('fLoc').value = t.loc || '';
   $('fNote').value = t.note || '';
+  $('fProg').value = t.prog ?? '';
   $('fStart').value = t.start;
   $('fEnd').value = t.end;
   $('fSt').value = t.st || '';
@@ -775,6 +942,12 @@ function posUnder(e) {
   return c ? { row: c.dataset.row, date: c.dataset.date } : null;
 }
 /* 拖曳事件條到其他格子：平移日期；單列事件可換到目標列 */
+function resizeTodo(id, iso) {
+  const t = data.todos.find(x => x.id === id);
+  if (!t || iso < t.start || iso === t.end) return;
+  t.end = iso;
+  save(); render();
+}
 function moveTodo(id, from, to) {
   const t = data.todos.find(x => x.id === id);
   if (!t) return;
@@ -791,7 +964,7 @@ $('board').addEventListener('pointerdown', e => {
   if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('[data-nplus]')) return;
   const bar = e.target.closest('[data-todo]');
   if (!bar) return;
-  drag = { id: bar.dataset.todo, x: e.clientX, y: e.clientY, grab: posUnder(e), el: bar, on: false };
+  drag = { id: bar.dataset.todo, x: e.clientX, y: e.clientY, grab: posUnder(e), el: bar, on: false, rz: !!e.target.closest('.g-rz') };
 });
 document.addEventListener('pointermove', e => {
   if (!drag) return;
@@ -810,6 +983,7 @@ document.addEventListener('pointerup', e => {
   suppressClick = true;
   setTimeout(() => { suppressClick = false; }, 150);
   const to = posUnder(e);
+  if (d.rz) { if (to) resizeTodo(d.id, to.date); return; }
   if (to && d.grab) moveTodo(d.id, d.grab, to);
 });
 
@@ -907,6 +1081,12 @@ function doPrint() {
   const weeks = [];
   for (let w = mondayOf(from); w <= to; w = addDays(w, 7)) weeks.push(w);
 
+  if ($('pLayout').value === 'gantt') {
+    $('print').innerHTML = ganttPrintHTML(from, to, rows);
+    closePrint();
+    window.print();
+    return;
+  }
   const pNotes = $('pNotes').value;
   const shown = pNotes === 'pos' ? new Set() : null;
   const yearKeys = [];
@@ -936,6 +1116,91 @@ function doPrint() {
   $('print').innerHTML = html;
   closePrint();
   window.print();
+}
+
+/* 甘特圖列印：每頁兩個 12 天區塊並排（每天 30 像素，A4 橫向剛好放下），列往下排，超過高度就接到下一頁 */
+function ganttPrintHTML(from, to, rows) {
+  const DW = 30, BD = 12, LW = 120, LIMIT = 660, LANE = 34;
+  const days = [];
+  for (let d = new Date(from); d <= to; d = addDays(d, 1)) days.push(new Date(d));
+  const chunks = [];
+  for (let i = 0; i < days.length; i += BD) chunks.push(days.slice(i, i + BD));
+  const layout = (row, ch) => {
+    const cfrom = toISO(ch[0]), cto = toISO(ch[ch.length - 1]);
+    const segs = data.todos
+      .filter(t => t.rows.includes(row.id) && t.end >= cfrom && t.start <= cto)
+      .map(t => ({ t, cs: Math.round((parse(t.start > cfrom ? t.start : cfrom) - ch[0]) / DAY_MS), ce: Math.round((parse(t.end < cto ? t.end : cto) - ch[0]) / DAY_MS) + 1 }))
+      .sort((a, b) => a.cs - b.cs || b.ce - a.ce);
+    const lanesEnd = [];
+    segs.forEach(sg => {
+      let l = lanesEnd.findIndex(x => x <= sg.cs);
+      if (l < 0) { l = lanesEnd.length; lanesEnd.push(0); }
+      lanesEnd[l] = sg.ce;
+      sg.lane = l;
+    });
+    return { h: Math.max(1, lanesEnd.length) * LANE + 8, segs };
+  };
+  const header = ch => {
+    let months = '';
+    for (let i = 0; i < ch.length;) {
+      let j = i;
+      while (j < ch.length && ch[j].getMonth() === ch[i].getMonth()) j++;
+      const mw = (j - i) * DW, mlabel = mw < 90 ? `${ch[i].getMonth() + 1} 月` : `${ch[i].getFullYear()} 年 ${ch[i].getMonth() + 1} 月`;
+      months += `<div class="g-month" style="width:${mw}px">${mlabel}</div>`;
+      i = j;
+    }
+    const dh = ch.map(d => `<div class="g-day${d.getDay() === 0 || d.getDay() === 6 ? ' we' : ''}${holidayOf(toISO(d)) ? ' hol' : ''}">${d.getDate()}</div>`).join('');
+    return `<div class="g-hrow"><div class="g-corner"></div><div class="g-months" style="width:${ch.length * DW}px">${months}</div></div>`
+      + `<div class="g-hrow"><div class="g-corner"></div><div class="g-days" style="width:${ch.length * DW}px">${dh}</div></div>`;
+  };
+  const block = (ch, idxs, heights, layouts) => {
+    if (!ch) return `<div class="gblock" style="width:${LW + BD * DW}px"></div>`;
+    let html = `<div class="gblock">${header(ch)}`;
+    idxs.forEach(i => {
+      const row = rows[i], c = row.color, h = heights[i], lay = layouts[i];
+      const cells = ch.map((d, k) => {
+        const we = d.getDay() === 0 || d.getDay() === 6;
+        return `<div class="cell g-cell" style="left:${k * DW}px;width:${DW}px;background:${c}${we ? '26' : '12'}"></div>`;
+      }).join('');
+      const bars = lay.segs.map(({ t, cs, ce, lane }) =>
+        `<div class="bar g-bar" style="left:${cs * DW + 2}px;width:${(ce - cs) * DW - 4}px;top:${lane * LANE + 4}px;background:${c}59;border-left-color:${c}">${progFill(t, c)}<span class="g-txt">${t.st ? `<span class="tm">${esc(t.st)}</span> ` : ''}${esc(t.text)}${progLabel(t)}</span></div>`).join('');
+      html += `<div class="g-row"><div class="g-label${row.depth ? ' sub' : ''}" style="background:${c}30;padding-left:${6 + row.depth * 8}px">${esc(row.name)}</div><div class="g-track" style="width:${ch.length * DW}px;height:${h}px">${cells}${bars}</div></div>`;
+    });
+    return html + '</div>';
+  };
+  /* 先依時段組合產生多組區塊（bands），再依頁面高度堆疊到頁面中，填滿後才換頁 */
+  const HEAD_H = 62;
+  const bands = [];
+  for (let k = 0; k < chunks.length; k += 2) {
+    const L = chunks[k], R = k + 1 < chunks.length ? chunks[k + 1] : null;
+    const layL = rows.map(r => layout(r, L));
+    const layR = R ? rows.map(r => layout(r, R)) : null;
+    const heights = rows.map((_, i) => Math.max(layL[i].h, R ? layR[i].h : 0));
+    const layoutsR = rows.map((_, i) => (R ? layR[i] : null));
+    const slices = [];
+    let cur = [], acc = 0;
+    rows.forEach((_, i) => {
+      if (acc + heights[i] > LIMIT - HEAD_H && cur.length) { slices.push(cur); cur = []; acc = 0; }
+      cur.push(i); acc += heights[i];
+    });
+    if (cur.length || !rows.length) slices.push(cur);
+    slices.forEach(idxs => {
+      const h = HEAD_H + idxs.reduce((sum, i) => sum + heights[i], 0) + 14;
+      const html = `<div class="gpair">${block(L, idxs, heights, rows.map((_, i) => layL[i]))}${R ? block(R, idxs, heights, layoutsR) : block(null, idxs, heights, layoutsR)}</div>`;
+      bands.push({ h, html });
+    });
+  }
+  let out = '', pageHtml = '', acc = 0;
+  bands.forEach(bd => {
+    if (acc > 0 && acc + bd.h > LIMIT) {
+      out += `<div class="gpage">${pageHtml}</div>`;
+      pageHtml = ''; acc = 0;
+    }
+    pageHtml += bd.html;
+    acc += bd.h;
+  });
+  if (pageHtml) out += `<div class="gpage">${pageHtml}</div>`;
+  return out;
 }
 
 function exportJSON() {
@@ -1184,6 +1449,7 @@ async function importFile(file) {
       text: String(t.text),
       loc: t.loc ? String(t.loc) : '',
       note: t.note ? String(t.note) : '',
+      prog: (t.prog !== '' && t.prog !== null && Number.isFinite(+t.prog)) ? Math.min(100, Math.max(0, Math.round(+t.prog))) : undefined,
       src: t.src ? String(t.src) : undefined
     }));
   const notes = Array.isArray(obj.notes)
@@ -1204,14 +1470,16 @@ $('form').addEventListener('submit', e => {
   if (en < s) [s, en] = [en, s];
   const loc = $('fLoc').value.trim();
   const note = $('fNote').value.trim();
+  const progRaw = $('fProg').value;
+  const prog = progRaw === '' ? undefined : Math.min(100, Math.max(0, Math.round(+progRaw)));
   const rowsSel = [...$('fRows').querySelectorAll('input:checked')].map(i => i.value);
   if (!rowsSel.length) { alert('請至少選擇一列'); return; }
   const st = $('fSt').value, et = $('fEt').value;
   if (editingId) {
     const t = data.todos.find(x => x.id === editingId);
-    if (t) Object.assign(t, { text, loc, note, start: s, end: en, rows: rowsSel, st, et });
+    if (t) Object.assign(t, { text, loc, note, prog, start: s, end: en, rows: rowsSel, st, et });
   } else {
-    data.todos.push({ id: uid(), rows: rowsSel, start: s, end: en, text, loc, note, st, et });
+    data.todos.push({ id: uid(), rows: rowsSel, start: s, end: en, text, loc, note, prog, st, et });
   }
   save(); closeDlg(); render();
 });
@@ -1366,12 +1634,26 @@ $('board').addEventListener('click', e => {
   if (nt) { const n = data.notes.find(x => x.id === nt.dataset.note); if (n) openNote(n); return; }
   const lb = e.target.closest('[data-rowedit]');
   if (lb) { openRowDlg(lb.dataset.rowedit, null); return; }
+  const gb = e.target.closest('.g-bar');
+  if (gb) {
+    /* 單擊展開/收合；雙擊編輯（雙擊時會取消單擊的展開） */
+    clearTimeout(gClickTimer);
+    gClickTimer = setTimeout(() => { const id = gb.dataset.todo; if (gExpanded.has(id)) gExpanded.delete(id); else gExpanded.add(id); render(); }, 230);
+    return;
+  }
   const bar = e.target.closest('[data-todo]');
   if (bar) { openDlg(data.todos.find(t => t.id === bar.dataset.todo), posUnder(e)); return; }
   const cell = e.target.closest('.cell');
   if (cell) openDlg(null, { row: cell.dataset.row, date: cell.dataset.date });
 });
 
+$('board').addEventListener('dblclick', e => {
+  const gb = e.target.closest('.g-bar');
+  if (!gb) return;
+  clearTimeout(gClickTimer);
+  const t = data.todos.find(x => x.id === gb.dataset.todo);
+  if (t) openDlg(t, posUnder(e));
+});
 $('addrow').onclick = () => openRowDlg(null, null);
 $('addnote').onclick = () => openNote(null);
 $('nScope').addEventListener('change', () => fillNoteTargets());
@@ -1404,6 +1686,10 @@ $('next').onclick = () => step(1);
 $('today').onclick = () => {
   anchor = new Date();
   render();
+  if (view === 'gantt') {
+    const g = document.querySelector('#board .g-day.today');
+    if (g) g.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }
   /* 年檢視下整年的週都在同一頁，捲動到今天所在的那一週 */
   if (view === 'year') {
     const t = document.querySelector('#board .dcell.today');
@@ -1414,6 +1700,7 @@ document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { view =
 
 applyUI();
 updateBk();
+bindGanttScroll();
 render();
 </script>
 </body>
