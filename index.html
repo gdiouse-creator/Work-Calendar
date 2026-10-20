@@ -78,9 +78,9 @@ button:hover{border-color:#c9c7bf}
 .label{flex-direction:column;gap:4px}
 .dlg textarea{font:inherit;color:var(--ink);padding:7px 9px;border:1px solid var(--line);border-radius:8px;resize:vertical}
 .dlg label[hidden]{display:none}
-.mask{position:fixed;inset:0;background:rgba(40,48,44,.22);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.mask{position:fixed;inset:0;background:rgba(40,48,44,.22);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
 .mask[hidden]{display:none}
-.dlg{background:#fff;border-radius:14px;padding:20px;width:min(380px,100%);box-shadow:0 10px 40px rgba(0,0,0,.12);display:grid;gap:12px;max-height:90vh;overflow:auto}
+.dlg{background:#fff;border-radius:14px;padding:20px;width:min(380px,100%);box-shadow:0 10px 40px rgba(0,0,0,.12);display:grid;gap:12px;max-height:90vh;max-height:90dvh;overflow:auto;overscroll-behavior:contain}
 .dlg label{display:grid;gap:4px;font-size:12px;color:var(--muted)}
 .dlg input:not(.chk),.dlg select{font:inherit;color:var(--ink);padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fff}
 .dlg input:not(.chk):focus,.dlg select:focus{outline:none;border-color:var(--accent)}
@@ -140,6 +140,8 @@ button:hover{border-color:#c9c7bf}
 }
 /* 手機：整週橫向捲動，每天欄寬固定，文字不被壓縮；列名欄固定在左邊 */
 @media (max-width:640px){
+  .mask{padding:10px}
+  .dlg{width:100%;max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px)}
   .board{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .dhead,.row{grid-template-columns:64px max-content}
   .days,.grid{grid-template-columns:repeat(7,120px)}
@@ -785,7 +787,8 @@ function moveTodo(id, from, to) {
   save(); render();
 }
 $('board').addEventListener('pointerdown', e => {
-  if (e.button !== 0 || e.target.closest('[data-nplus]')) return;
+  /* 只允許滑鼠拖曳，手機觸控不移動事件，避免誤觸 */
+  if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('[data-nplus]')) return;
   const bar = e.target.closest('[data-todo]');
   if (!bar) return;
   drag = { id: bar.dataset.todo, x: e.clientX, y: e.clientY, grab: posUnder(e), el: bar, on: false };
