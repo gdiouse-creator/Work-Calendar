@@ -402,7 +402,19 @@ const monthEnd = v => { const [y,m] = v.split('-').map(Number); return new Date(
 
 let data;
 try { data = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
-if (!data || !Array.isArray(data.rows)) data = { rows: [{ id: uid(), name: '我方', parent: null, color: PALETTE[0] }], todos: [] };
+if (!data || !Array.isArray(data.rows)) {
+  /* 首次開啟的示範資料：列名與本月中間那一格（第三或第四週的週四）的示範事件 */
+  const rowId = uid();
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+  const first = new Date(y, m, 1);
+  const off = (first.getDay() + 6) % 7;
+  const weeksN = Math.ceil((off + new Date(y, m + 1, 0).getDate()) / 7);
+  const midISO = toISO(addDays(first, -off + Math.floor(weeksN / 2) * 7 + 3));
+  data = {
+    rows: [{ id: rowId, name: '可以任意新增刪除列', parent: null, color: PALETTE[0] }],
+    todos: [{ id: uid(), rows: [rowId], start: midISO, end: midISO, text: '直接點擊格子新增、編輯和刪除', loc: '', st: '', et: '' }]
+  };
+}
 if (!Array.isArray(data.todos)) data.todos = [];
 if (!data.customHolidays) data.customHolidays = {};
 if (!Array.isArray(data.notes)) data.notes = [];
