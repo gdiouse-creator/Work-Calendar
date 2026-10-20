@@ -1157,6 +1157,7 @@ async function importFile(file) {
       end: t.end,
       text: String(t.text),
       loc: t.loc ? String(t.loc) : '',
+      note: t.note ? String(t.note) : '',
       src: t.src ? String(t.src) : undefined
     }));
   const notes = Array.isArray(obj.notes)
