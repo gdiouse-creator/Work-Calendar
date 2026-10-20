@@ -31,7 +31,7 @@ button:hover{border-color:#c9c7bf}
 .dlabel{background:#fbfaf7;cursor:default;pointer-events:none}
 .dates{background:#fff}
 .bar.dragging{opacity:.55}
-.nplus{display:inline-block;margin-left:5px;padding:0 6px;border-radius:9px;background:#ffffffb0;font-weight:700;line-height:1.5;cursor:pointer}
+.nplus{display:inline-block;margin-left:5px;padding:0 9px;min-width:22px;text-align:center;border-radius:11px;background:#ffffffb0;font-weight:700;line-height:1.6;cursor:pointer;touch-action:manipulation}
 .tnote{margin-top:3px;font-size:calc(var(--fs) - 2px);color:#3f4a45;white-space:normal;font-weight:400}
 .dcell{padding:4px 5px 2px;min-width:0;border-left:1px solid var(--line)}
 .dcell:first-child{border-left:none}
@@ -131,6 +131,11 @@ button:hover{border-color:#c9c7bf}
   #print .pmonth{break-after:page}
   #print .pmonth:last-child{break-after:auto}
   #print .week,#print .row{break-inside:avoid}
+  #print .ptable{width:100%;border-collapse:collapse}
+  #print .ptable thead{display:table-header-group}
+  #print .ptable tr{break-inside:avoid}
+  #print .ptable td{padding:0;vertical-align:top}
+  #print .ptable tbody tr+tr td{border-top:1px solid var(--line)}
   #print .cell:hover,#print .label:hover,#print .bar:hover{filter:none}
 }
 /* 手機：整週橫向捲動，每天欄寬固定，文字不被壓縮；列名欄固定在左邊 */
@@ -458,7 +463,7 @@ let view = 'month';
 let anchor = new Date();
 let editingId = null;
 let ctxPos = null;
-const openNotes = new Set();
+const closedNotes = new Set();
 let suppressClick = false, drag = null;
 let rowEdit = null;
 let rowColorSel = PALETTE[0];
@@ -681,8 +686,9 @@ function gridHTML(weeks, isIn, rows, shown) {
         /* 下列的條往上多蓋 1px，把兩列之間的分隔線蓋住，讓多列事件連成一體 */
         const ext = (hasAbove ? 'margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0;min-height:22px;' : '')
           + (hasBelow ? 'margin-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0;' : '');
-        const plus = t.note ? `<span class="nplus" data-nplus="${t.id}">+</span>` : '';
-        const tnote = t.note && openNotes.has(t.id) ? `<div class="tnote">${esc(t.note).replace(/\n/g, '<br>')}</div>` : '';
+        const showNote = !!t.note && !closedNotes.has(t.id);
+        const plus = t.note ? `<span class="nplus" data-nplus="${t.id}">${showNote ? '−' : '+'}</span>` : '';
+        const tnote = showNote ? `<div class="tnote">${esc(t.note).replace(/\n/g, '<br>')}</div>` : '';
         const text = hasAbove ? '' : `<div>${t.st ? `<span class="tm">${esc(t.st)}</span> ` : ''}${esc(t.text)}${plus}</div>${t.loc ? `<div class="loc">${esc(t.loc)}</div>` : ''}${tnote}`;
         return `<div class="bar" data-todo="${t.id}" style="grid-column:${cs}/${ce};grid-row:${lane + 1} / ${span + 2};background:${bg};border-left-color:${c};${ext}" title="${esc(t.text + (t.loc ? ' · ' + t.loc : ''))}">${text}</div>`;
       }).join('');
@@ -918,7 +924,10 @@ function doPrint() {
     });
   } else {
     const title = `${from.getFullYear()} 年 ${from.getMonth() + 1} 月 – ${to.getFullYear()} 年 ${to.getMonth() + 1} 月`;
-    html = `<div class="ptitle">${title}</div>${notesOf([...yearKeys, ...periodKeysIn(from, to)])}<div class="board">${boardInner(weeks, isIn, rows, shown)}</div>`;
+    /* 連續模式用表格：星期標題放在表頭，每頁自動重複；每週一列，可接續排列 */
+    const headHTML = `<div class="dhead"><div></div><div class="days">${DAYS.map(n => `<div class="dayname">${n}</div>`).join('')}</div></div>`;
+    const body = weeks.map(w => `<tr><td>${gridHTML([w], isIn, rows, shown)}</td></tr>`).join('');
+    html = `<div class="ptitle">${title}</div>${notesOf([...yearKeys, ...periodKeysIn(from, to)])}<div class="board"><table class="ptable"><thead><tr><td>${headHTML}</td></tr></thead><tbody>${body}</tbody></table></div>`;
   }
   if (pNotes !== 'none') html += endNotesHTML(ids, from, to, pNotes === 'pos');
   $('print').innerHTML = html;
@@ -1349,7 +1358,7 @@ document.addEventListener('keydown', e => {
 $('board').addEventListener('click', e => {
   if (suppressClick) return;
   const np = e.target.closest('[data-nplus]');
-  if (np) { const id = np.dataset.nplus; if (openNotes.has(id)) openNotes.delete(id); else openNotes.add(id); render(); return; }
+  if (np) { const id = np.dataset.nplus; if (closedNotes.has(id)) closedNotes.delete(id); else closedNotes.add(id); render(); return; }
   const nt = e.target.closest('[data-note]');
   if (nt) { const n = data.notes.find(x => x.id === nt.dataset.note); if (n) openNote(n); return; }
   const lb = e.target.closest('[data-rowedit]');
