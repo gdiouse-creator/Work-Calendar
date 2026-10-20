@@ -412,7 +412,7 @@ if (!data || !Array.isArray(data.rows)) {
   const midISO = toISO(addDays(first, -off + Math.floor(weeksN / 2) * 7 + 3));
   data = {
     rows: [{ id: rowId, name: '可以任意新增刪除列', parent: null, color: PALETTE[0] }],
-    todos: [{ id: uid(), rows: [rowId], start: midISO, end: midISO, text: '直接點擊格子新增、編輯和刪除', loc: '', st: '', et: '' }]
+    todos: [{ id: uid(), rows: [rowId], start: midISO, end: midISO, text: '直接點擊格子新增、編輯和刪除', loc: '', note: '恭喜你發現按+可以開啟隱藏我', st: '', et: '' }]
   };
 }
 if (!Array.isArray(data.todos)) data.todos = [];
