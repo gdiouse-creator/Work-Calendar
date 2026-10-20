@@ -9,6 +9,9 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:var(--fs)}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:20px 12px 56px}
+.credit{font-size:12px;color:#b3bab5;margin:0 0 6px;line-height:1.5}
+.credit a{color:#b3bab5;text-decoration:underline;text-underline-offset:2px}
+.credit a:hover{color:#8a938e}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:30;background:var(--bg);padding:10px 0 8px}
 .seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:8px;padding:2px}
 .seg button{border:none;padding:4px 14px;border-radius:6px;background:none}
@@ -144,6 +147,7 @@ button:hover{border-color:#c9c7bf}
 </head>
 <body>
 <div class="wrap screen">
+  <div class="credit">製作者楚狂 · <a href="https://leouse.wordpress.com/category/%E5%89%B5%E4%BD%9C/" target="_blank" rel="noopener">更多AI協作效率系統</a></div>
   <div class="top">
     <div class="seg">
       <button data-view="month">月</button><button data-view="week">週</button><button data-view="year">年</button>
@@ -1309,6 +1313,27 @@ document.addEventListener('keydown', e => {
   e.preventDefault();
   step(e.key === 'ArrowLeft' ? -1 : 1);
 });
+/* 手機返回鍵：對話框開啟時，返回鍵只關閉最上層的對話框，不離開頁面 */
+const layerClose = { mask: closeDlg, rmask: closeRowDlg, vmask: closeVis, fmask: closeFile, nmask: closeNote, emask: closeIcsExport, imask: closeImport, pmask: closePrint };
+const anyMaskOpen = () => document.querySelector('.mask:not([hidden])') !== null;
+let layerPushed = false;
+document.querySelectorAll('.mask').forEach(m => new MutationObserver(() => {
+  if (!m.hidden && !layerPushed) {
+    history.pushState({ dlg: true }, '');
+    layerPushed = true;
+  } else if (m.hidden && !anyMaskOpen() && layerPushed) {
+    layerPushed = false;
+    if (history.state && history.state.dlg) history.back();
+  }
+}).observe(m, { attributes: true, attributeFilter: ['hidden'] }));
+window.addEventListener('popstate', () => {
+  const open = [...document.querySelectorAll('.mask:not([hidden])')];
+  if (!open.length) return;
+  const top = open[open.length - 1];
+  layerPushed = false;
+  (layerClose[top.id] || (() => { top.hidden = true; }))();
+});
+
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!$('mask').hidden) closeDlg();
