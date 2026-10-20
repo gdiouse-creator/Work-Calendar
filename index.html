@@ -130,6 +130,16 @@ button:hover{border-color:#c9c7bf}
   #print .week,#print .row{break-inside:avoid}
   #print .cell:hover,#print .label:hover,#print .bar:hover{filter:none}
 }
+/* 手機：整週橫向捲動，每天欄寬固定，文字不被壓縮；列名欄固定在左邊 */
+@media (max-width:640px){
+  .board{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .dhead,.row{grid-template-columns:64px max-content}
+  .days,.grid{grid-template-columns:repeat(7,120px)}
+  .dhead>div:first-child,.dlabel,.label{position:sticky;left:0;z-index:4}
+  .dhead>div:first-child,.dlabel{background:#fbfaf7}
+  .label{isolation:isolate}
+  .label::before{content:'';position:absolute;inset:0;background:#fff;z-index:-1}
+}
 </style>
 </head>
 <body>
