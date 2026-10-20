@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>行事曆</title>
+<style>
+:root{--line:#e5e3dc;--bg:#f7f6f2;--ink:#2e3a34;--muted:#8a938e;--accent:#3d7a5f;--fs:14px;--maxw:1120px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:var(--fs)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:20px 12px 56px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:30;background:var(--bg);padding:10px 0 8px}
+.seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:8px;padding:2px}
+.seg button{border:none;padding:4px 14px;border-radius:6px;background:none}
+.seg button.on{background:var(--accent);color:#fff}
+.nav{display:flex;align-items:center;gap:8px}
+.title{font-size:calc(var(--fs) + 3px);font-weight:600;min-width:160px;text-align:center;letter-spacing:.02em}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+button{font:inherit;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:#c9c7bf}
+.setbar{display:flex;gap:20px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:0 0 14px}
+.setbar label{display:flex;align-items:center;gap:8px}
+.setbar input{width:150px}
+.appear{display:grid;gap:14px;margin:0 0 18px;color:var(--muted);font-size:13px}
+.appear label{display:flex;align-items:center;gap:10px}
+.appear input[type=range]{flex:1;min-width:0}
+.sechead{font-size:13px;color:var(--muted);margin:0 0 6px}
+.dlabel{background:#fbfaf7;cursor:default;pointer-events:none}
+.dates{background:#fff}
+.bar.dragging{opacity:.55}
+.nplus{display:inline-block;margin-left:5px;padding:0 6px;border-radius:9px;background:#ffffffb0;font-weight:700;line-height:1.5;cursor:pointer}
+.tnote{margin-top:3px;font-size:calc(var(--fs) - 2px);color:#3f4a45;white-space:normal;font-weight:400}
+.dcell{padding:4px 5px 2px;min-width:0;border-left:1px solid var(--line)}
+.dcell:first-child{border-left:none}
+.dcell .d{font-size:calc(var(--fs) - 2px)}
+.dcell.out .d{opacity:.45}
+.lanes{min-height:34px}
+.board{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dhead,.row{display:grid;grid-template-columns:120px minmax(0,1fr)}
+.dhead{background:#fbfaf7;border-bottom:1px solid var(--line)}
+.days,.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.grid{position:relative}
+.dayname{padding:6px 8px;font-size:calc(var(--fs) - 1px);color:var(--muted);font-weight:600;text-align:center}
+.week+.week{border-top:1px solid var(--line)}
+.row+.row{border-top:1px solid #f0efe9}
+.label{display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 6px;border-right:1px solid var(--line);font-weight:600;word-break:break-all;line-height:1.35;cursor:pointer;min-width:0}
+.label:hover{filter:brightness(.96)}
+.label.sub{font-weight:500;font-size:calc(var(--fs) - 1px)}
+.cell{position:relative;border-left:1px solid #ffffffa0;padding:3px 5px;cursor:cell;min-width:0}
+.cell:first-child{border-left:none}
+.cell:hover{filter:brightness(.97)}
+.cell.out .d{opacity:.45}
+.d{display:flex;align-items:baseline;justify-content:flex-end;gap:4px;min-width:0;font-size:calc(var(--fs) - 3px);color:var(--muted);line-height:1.4}
+.d>span:last-child{flex:none}
+.hol{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;font-size:calc(var(--fs) - 4px);color:#a9b0ac;font-weight:400}
+.today .d{color:var(--accent);font-weight:700}
+.tday{flex:none;align-self:center;color:var(--accent)}
+#today{display:inline-flex;align-items:center;gap:6px}
+.bar{position:relative;z-index:1;margin:3px;padding:3px 6px;border-left:3px solid;border-radius:5px;font-size:var(--fs);line-height:1.35;word-break:break-all;overflow-wrap:anywhere;cursor:pointer;min-width:0}
+.bar:hover{filter:brightness(.96)}
+.loc{font-size:calc(var(--fs) - 3px);color:#55605a;margin-top:1px}
+.tm{font-size:calc(var(--fs) - 2px);font-weight:700;color:#3e4a44;margin-right:2px}
+.strip{position:absolute;top:-1px;height:9px;border-radius:0 0 4px 4px;cursor:pointer}
+.strip span{font-weight:700}
+.bar .down{position:absolute;right:5px;bottom:1px;font-size:12px;font-weight:700;opacity:.75}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+.addbar{display:flex;gap:8px;margin-top:14px}
+.addrow{margin:0;flex:1;color:var(--muted);border-style:dashed;background:transparent}
+.notes{display:grid;gap:6px;margin:0 0 12px}
+.notes:empty{display:none}
+#noteAll{margin:12px 0 0}
+.pnotes{display:grid;gap:6px;margin:8px 0}
+.note{background:#fbfaf7;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:calc(var(--fs) - 1px);color:#4b5651;white-space:normal;cursor:pointer}
+.note.small{font-size:calc(var(--fs) - 3px);padding:2px 6px;margin:0;font-weight:400;text-align:center}
+.label{flex-direction:column;gap:4px}
+.dlg textarea{font:inherit;color:var(--ink);padding:7px 9px;border:1px solid var(--line);border-radius:8px;resize:vertical}
+.dlg label[hidden]{display:none}
+.mask{position:fixed;inset:0;background:rgba(40,48,44,.22);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.mask[hidden]{display:none}
+.dlg{background:#fff;border-radius:14px;padding:20px;width:min(380px,100%);box-shadow:0 10px 40px rgba(0,0,0,.12);display:grid;gap:12px;max-height:90vh;overflow:auto}
+.dlg label{display:grid;gap:4px;font-size:12px;color:var(--muted)}
+.dlg input:not(.chk),.dlg select{font:inherit;color:var(--ink);padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.dlg input:not(.chk):focus,.dlg select:focus{outline:none;border-color:var(--accent)}
+.dlgtitle{font-size:15px;font-weight:600}
+.hint{font-size:13px;color:var(--muted)}
+.dlg .chkrow{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink)}
+.vrow{display:flex;align-items:center;gap:8px}
+.vrow .chkrow{flex:1;min-width:0}
+.mv{display:flex;gap:2px;flex:none}
+#pRows,#vList,#eList,#fRows{display:grid;gap:8px;max-height:240px;overflow:auto}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts{display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:6px;flex-wrap:wrap}
+.acts .r{display:flex;gap:6px;flex-wrap:wrap}
+.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.danger{color:#a4524f}
+.pc{width:26px;height:26px;border-radius:5px;border:2px solid transparent;padding:0}
+.pc.on{border-color:var(--ink)}
+.pcs{display:flex;gap:8px;flex-wrap:wrap}
+.setbar input[type=checkbox]{width:auto}
+.bk{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#fbfaf7;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 12px;color:var(--muted);font-size:13px}
+.bk[hidden]{display:none}
+.bkbtns{display:flex;gap:6px}
+.menu{display:grid;gap:8px}
+.mi{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 12px}
+.mt{font-weight:600}
+.md{font-size:12px;color:var(--muted)}
+#print{display:none}
+.ptitle{font-size:15px;font-weight:600;margin:0 0 8px}
+#fileIn{display:none}
+@media (max-width:640px){
+  .wrap{padding:12px 6px 40px}
+  .dhead,.row{grid-template-columns:64px minmax(0,1fr)}
+  .dayname{padding:6px 2px;font-size:calc(var(--fs) - 3px)}
+  .cell{padding:2px 3px}
+  .bar{margin:2px 2px;padding:2px 4px;border-left-width:2px}
+  .setbar .wid,.appear .wid{display:none}
+  .title{min-width:0;font-size:15px}
+  .tools button,.seg button{padding:4px 8px}
+  .two{grid-template-columns:1fr}
+}
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff;font-size:10pt}
+  .screen,.mask{display:none!important}
+  #print{display:block}
+  #print .board{border:none;border-radius:0}
+  #print .pmonth{break-after:page}
+  #print .pmonth:last-child{break-after:auto}
+  #print .week,#print .row{break-inside:avoid}
+  #print .cell:hover,#print .label:hover,#print .bar:hover{filter:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap screen">
+  <div class="top">
+    <div class="seg">
+      <button data-view="month">月</button><button data-view="week">週</button><button data-view="year">年</button>
+    </div>
+    <div class="nav">
+      <button id="prev">‹</button>
+      <div class="title" id="title"></div>
+      <button id="next">›</button>
+    </div>
+    <div class="tools">
+      <button id="today"><svg class="tday" viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><circle cx="6" cy="6" r="4.4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.7" fill="currentColor"/></svg>今天</button>
+      <button id="visBtn">顯示列</button>
+      <button id="fileBtn">檔案</button>
+    </div>
+  </div>
+  <div class="setbar">
+    <label><input type="checkbox" id="holTog"> 國定假日</label>
+  </div>
+  <div class="bk" id="bk" hidden><span id="bkText"></span><span class="bkbtns"><button id="bkGo" class="primary">匯出</button><button id="bkLater">稍後</button></span></div>
+  <div class="notes" id="notePeriod"></div>
+  <div class="board" id="board"></div>
+  <div class="addbar"><button class="addrow" id="addrow">+ 新增列</button><button class="addrow" id="addnote">+ 新增備註</button></div>
+  <div class="notes" id="noteAll"></div>
+  <input type="file" id="fileIn" accept=".json,.ics,application/json,text/calendar">
+</div>
+
+<div class="mask" id="mask" hidden>
+  <form class="dlg" id="form">
+    <label>事項<input id="fText" maxlength="120" autocomplete="off"></label>
+    <label>地點<input id="fLoc" maxlength="60" autocomplete="off" placeholder="選填"></label>
+    <label>備註<textarea id="fNote" rows="2" maxlength="400" placeholder="選填"></textarea></label>
+    <div class="two">
+      <label>開始<input type="date" id="fStart"></label>
+      <label>結束<input type="date" id="fEnd"></label>
+    </div>
+    <div class="two">
+      <label>開始時間<input type="time" id="fSt"></label>
+      <label>結束時間<input type="time" id="fEt"></label>
+    </div>
+    <div class="hint">列（可複選）</div>
+    <div id="fRows"></div>
+    <div class="acts">
+      <button type="button" class="danger" id="fDel" hidden>刪除</button>
+      <div class="r">
+        <button type="button" id="fAdd" hidden>新增事件</button>
+        <button type="button" id="fCancel">取消</button>
+        <button type="submit" class="primary">儲存</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="mask" id="rmask" hidden>
+  <form class="dlg" id="rform">
+    <div class="dlgtitle" id="rTitle">列</div>
+    <label>名稱<input id="rName" maxlength="40" autocomplete="off"></label>
+    <div>
+      <div class="hint" style="margin-bottom:6px">顏色</div>
+      <div class="pcs" id="rColors"></div>
+    </div>
+    <div class="acts">
+      <div class="r">
+        <button type="button" class="danger" id="rDel" hidden>刪除</button>
+        <button type="button" id="rAddChild" hidden>新增子列</button>
+      </div>
+      <div class="r">
+        <button type="button" id="rCancel">取消</button>
+        <button type="submit" class="primary">儲存</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="mask" id="vmask" hidden>
+  <form class="dlg" id="vform">
+    <div class="dlgtitle">顯示設定</div>
+    <div class="appear">
+      <label>字體 <input type="range" id="fsz" min="11" max="22" step="1"></label>
+      <label class="wid">寬度 <input type="range" id="wid" min="320" step="10"></label>
+    </div>
+    <div class="sechead">顯示的列</div>
+    <div id="vList"></div>
+    <div class="acts">
+      <span></span>
+      <div class="r">
+        <button type="button" id="vCancel">取消</button>
+        <button type="submit" class="primary">儲存</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="mask" id="fmask" hidden>
+  <div class="dlg">
+    <div class="dlgtitle">檔案</div>
+    <div class="menu">
+      <button type="button" class="mi" data-act="import"><span class="mt">匯入</span><span class="md">從 JSON 或 Google 日曆的 ICS 檔讀入事項</span></button>
+      <button type="button" class="mi" data-act="json"><span class="mt">匯出 JSON</span><span class="md">儲存完整資料，之後可再匯入本系統</span></button>
+      <button type="button" class="mi" data-act="ics"><span class="mt">匯出 ICS</span><span class="md">選擇要匯出的列，產生可匯入 Google 日曆的檔案</span></button>
+      <button type="button" class="mi" data-act="print"><span class="mt">列印 / PDF</span><span class="md">選擇月份範圍與列，用瀏覽器存成 PDF</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="nmask" hidden>
+  <form class="dlg" id="nform">
+    <div class="dlgtitle" id="nTitle">備註</div>
+    <label>內容<textarea id="nText" rows="4" maxlength="400"></textarea></label>
+    <label>位置
+      <select id="nScope">
+        <option value="all">整個行事曆最下方</option>
+        <option value="row">某一列</option>
+        <option value="period">目前檢視的期間</option>
+      </select>
+    </label>
+    <label id="nTargetWrap">對象<select id="nTarget"></select></label>
+    <div class="acts">
+      <button type="button" class="danger" id="nDel" hidden>刪除</button>
+      <div class="r">
+        <button type="button" id="nCancel">取消</button>
+        <button type="submit" class="primary">儲存</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="mask" id="emask" hidden>
+  <form class="dlg" id="eform">
+    <div class="dlgtitle">匯出 ICS</div>
+    <div class="hint">選擇要匯出的列</div>
+    <div id="eList"></div>
+    <div class="acts">
+      <span></span>
+      <div class="r">
+        <button type="button" id="eCancel">取消</button>
+        <button type="submit" class="primary">匯出</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="mask" id="imask" hidden>
+  <form class="dlg" id="iform">
+    <div class="dlgtitle">匯入行事曆</div>
+    <div class="hint" id="iInfo"></div>
+    <label>匯入到<select id="iRow"></select></label>
+    <div class="acts">
+      <span></span>
+      <div class="r">
+        <button type="button" id="iCancel">取消</button>
+        <button type="submit" class="primary" id="iGo">匯入</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="mask" id="pmask" hidden>
+  <div class="dlg">
+    <div class="dlgtitle">列印範圍</div>
+    <div class="two">
+      <label>開始月份<input type="month" id="pFrom"></label>
+      <label>結束月份<input type="month" id="pTo"></label>
+    </div>
+    <label>版面
+      <select id="pLayout">
+        <option value="continuous">連續</option>
+        <option value="paged">每月分頁</option>
+      </select>
+    </label>
+    <label>備註
+      <select id="pNotes">
+        <option value="none">不輸出</option>
+        <option value="end">集中放在最後</option>
+        <option value="pos">放在各自位置</option>
+      </select>
+    </label>
+    <div>
+      <div class="hint" style="margin-bottom:6px">列</div>
+      <div id="pRows"></div>
+    </div>
+    <div class="acts">
+      <span></span>
+      <div class="r">
+        <button type="button" id="pCancel">取消</button>
+        <button type="button" class="primary" id="pGo">列印</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="print"></div>
+
+<script>
+const KEY = 'weekly-board-v1';
+const UI_KEY = 'weekly-board-ui';
+const FORMAT = 'weekly-board';
+const PALETTE = ['#6f9d86','#7b93c2','#c98f6b','#a68bc7','#c9a54a','#5fa3a6','#c77b8a','#8aa86a','#7a8794','#d08a4e'];
+const DAYS = ['週一','週二','週三','週四','週五','週六','週日'];
+const DAY_MS = 86400000;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+/* 行政院人事行政總處 115 年（2026）與 116 年（2027）政府行政機關辦公日曆表 */
+const HOLIDAYS = {
+  '2026-01-01': '元旦',
+  '2026-02-14': '春節假期',
+  '2026-02-15': '小年夜',
+  '2026-02-16': '除夕',
+  '2026-02-17': '春節',
+  '2026-02-18': '春節',
+  '2026-02-19': '春節',
+  '2026-02-20': '春節',
+  '2026-02-21': '春節',
+  '2026-02-22': '春節假期',
+  '2026-02-27': '和平紀念日補假',
+  '2026-02-28': '和平紀念日',
+  '2026-04-03': '兒童節補假',
+  '2026-04-04': '兒童節',
+  '2026-04-05': '清明節',
+  '2026-04-06': '清明節補假',
+  '2026-05-01': '勞動節',
+  '2026-06-19': '端午節',
+  '2026-09-25': '中秋節',
+  '2026-09-28': '教師節',
+  '2026-10-09': '國慶日補假',
+  '2026-10-10': '國慶日',
+  '2026-10-25': '臺灣光復節',
+  '2026-10-26': '光復節補假',
+  '2026-12-25': '行憲紀念日',
+  '2027-01-01': '開國紀念日',
+  '2027-02-04': '小年夜',
+  '2027-02-05': '除夕',
+  '2027-02-06': '春節',
+  '2027-02-07': '春節',
+  '2027-02-08': '春節',
+  '2027-02-09': '春節補假',
+  '2027-02-10': '春節補假',
+  '2027-02-28': '和平紀念日',
+  '2027-03-01': '和平紀念日補假',
+  '2027-04-04': '兒童節',
+  '2027-04-05': '清明節',
+  '2027-04-06': '兒童節補假',
+  '2027-04-30': '勞動節補假',
+  '2027-05-01': '勞動節',
+  '2027-06-09': '端午節',
+  '2027-09-15': '中秋節',
+  '2027-09-28': '教師節',
+  '2027-10-10': '國慶日',
+  '2027-10-11': '國慶日補假',
+  '2027-10-25': '臺灣光復節',
+  '2027-12-24': '行憲紀念日補假',
+  '2027-12-25': '行憲紀念日',
+  '2027-12-31': '元旦補假'
+};
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+const toISO = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const mondayOf = d => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
+const md = d => `${d.getMonth()+1}/${d.getDate()}`;
+const monthStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}`;
+const monthStart = v => { const [y,m] = v.split('-').map(Number); return new Date(y, m-1, 1); };
+const monthEnd = v => { const [y,m] = v.split('-').map(Number); return new Date(y, m, 0); };
+
+let data;
+try { data = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+if (!data || !Array.isArray(data.rows)) data = { rows: [{ id: uid(), name: '我方', parent: null, color: PALETTE[0] }], todos: [] };
+if (!Array.isArray(data.todos)) data.todos = [];
+if (!data.customHolidays) data.customHolidays = {};
+if (!Array.isArray(data.notes)) data.notes = [];
+data.rows.forEach((r, i) => {
+  if (r.parent === undefined) r.parent = null;
+  if (!r.color) r.color = PALETTE[i % PALETTE.length];
+  r.hidden = !!r.hidden;
+});
+data.todos.forEach(t => {
+  if (t.loc === undefined) t.loc = '';
+  if (!Array.isArray(t.rows)) t.rows = t.row ? [t.row] : [];
+  delete t.row;
+});
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} };
+
+let ui;
+try { ui = JSON.parse(localStorage.getItem(UI_KEY)) || {}; } catch (e) { ui = {}; }
+if (!ui.fs) ui.fs = 14;
+const saveUI = () => { try { localStorage.setItem(UI_KEY, JSON.stringify(ui)); } catch (e) {} };
+
+function holidayOf(iso) {
+  if (ui.holidays === false) return '';
+  return (data.customHolidays && data.customHolidays[iso]) || HOLIDAYS[iso] || '';
+}
+
+let view = 'month';
+let anchor = new Date();
+let editingId = null;
+let ctxPos = null;
+const openNotes = new Set();
+let suppressClick = false, drag = null;
+let rowEdit = null;
+let rowColorSel = PALETTE[0];
+let pendingIcs = null;
+let noteEdit = null;
+
+function periodKey(v, a) {
+  if (v === 'year') return 'Y:' + a.getFullYear();
+  if (v === 'month') return 'M:' + monthStr(a);
+  return 'W:' + toISO(mondayOf(a));
+}
+
+function keyLabel(k) {
+  const type = k.charAt(0), val = k.slice(2);
+  if (type === 'Y') return `${val} 年`;
+  if (type === 'M') { const [y, m] = val.split('-'); return `${y} 年 ${+m} 月`; }
+  const s = parse(val), e = addDays(s, 6);
+  return `${s.getFullYear()}/${md(s)} – ${md(e)}`;
+}
+
+function periodKeysIn(from, to) {
+  const keys = [];
+  for (let y = from.getFullYear(); y <= to.getFullYear(); y++) keys.push('Y:' + y);
+  for (let m = new Date(from.getFullYear(), from.getMonth(), 1); m <= to; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) keys.push('M:' + monthStr(m));
+  for (let w = mondayOf(from); w <= to; w = addDays(w, 7)) keys.push('W:' + toISO(w));
+  return keys;
+}
+
+function noteHTML(n) {
+  return `<div class="note" data-note="${n.id}">${esc(n.text).replace(/\n/g, '<br>')}</div>`;
+}
+
+function periodNotes(keys) { return data.notes.filter(n => n.scope === 'period' && keys.includes(n.target)); }
+
+function notesBlock(list) { return list.length ? `<div class="pnotes">${list.map(noteHTML).join('')}</div>` : ''; }
+
+function endNotesHTML(ids, from, to, allOnly) {
+  const keys = periodKeysIn(from, to);
+  return notesBlock(data.notes.filter(n => n.scope === 'all' || (!allOnly && ((n.scope === 'row' && ids.includes(n.target)) || (n.scope === 'period' && keys.includes(n.target))))));
+}
+
+/* 列備註只在該列第一次出現時顯示在名稱下方 */
+function rowNoteHTML(row, shown) {
+  if (!shown || shown.has(row.id)) return '';
+  shown.add(row.id);
+  return data.notes.filter(n => n.scope === 'row' && n.target === row.id)
+    .map(n => `<div class="note small" data-note="${n.id}">${esc(n.text).replace(/\n/g, '<br>')}</div>`).join('');
+}
+
+function fillNoteTargets(preferKey) {
+  const scope = $('nScope').value;
+  $('nTargetWrap').hidden = scope === 'all';
+  if (scope === 'all') return;
+  if (scope === 'row') { $('nTarget').innerHTML = rowOptions(preferKey || null); return; }
+  const key = preferKey || periodKey(view, anchor);
+  $('nTarget').innerHTML = `<option value="${key}">${esc(keyLabel(key))}</option>`;
+}
+
+function openNote(n) {
+  noteEdit = n ? n.id : null;
+  $('nTitle').textContent = n ? '編輯備註' : '新增備註';
+  $('nText').value = n ? n.text : '';
+  $('nScope').value = n ? n.scope : 'all';
+  fillNoteTargets(n && n.scope !== 'all' ? n.target : null);
+  $('nDel').hidden = !n;
+  $('nmask').hidden = false;
+  $('nText').focus();
+}
+function closeNote() { $('nmask').hidden = true; noteEdit = null; }
+
+/* 列的結構：all=false 時略過隱藏的列（連同其子列） */
+function flatRows(all = false) {
+  const out = [];
+  const walk = (pid, depth) => {
+    data.rows.filter(r => (r.parent || null) === pid).forEach(r => {
+      if (!all && r.hidden) return;
+      out.push({ ...r, depth });
+      walk(r.id, depth + 1);
+    });
+  };
+  walk(null, 0);
+  return out;
+}
+
+function descIds(id) {
+  const ids = [id];
+  for (let i = 0; i < ids.length; i++) data.rows.forEach(r => { if (r.parent === ids[i]) ids.push(r.id); });
+  return ids;
+}
+
+function nextColor() {
+  const used = data.rows.map(r => r.color);
+  return PALETTE.find(c => !used.includes(c)) || PALETTE[data.rows.length % PALETTE.length];
+}
+
+function weeksFor(v, a) {
+  if (v === 'week') return [mondayOf(a)];
+  let f, l;
+  if (v === 'month') { f = new Date(a.getFullYear(), a.getMonth(), 1); l = new Date(a.getFullYear(), a.getMonth() + 1, 0); }
+  else { f = new Date(a.getFullYear(), 0, 1); l = new Date(a.getFullYear(), 11, 31); }
+  const end = mondayOf(l), out = [];
+  for (let w = mondayOf(f); w <= end; w = addDays(w, 7)) out.push(w);
+  return out;
+}
+
+function inPeriod(d, v, a) {
+  if (v === 'week') return true;
+  if (v === 'year') return d.getFullYear() === a.getFullYear();
+  return d.getFullYear() === a.getFullYear() && d.getMonth() === a.getMonth();
+}
+
+function titleFor(v, a) {
+  if (v === 'year') return `${a.getFullYear()} 年`;
+  if (v === 'month') return `${a.getFullYear()} 年 ${a.getMonth() + 1} 月`;
+  const s = mondayOf(a), e = addDays(s, 6);
+  return `${s.getFullYear()}/${md(s)} – ${md(e)}`;
+}
+
+/* 同一列使用同一色系：首欄、一般格、假日、非當期格以深淺區分 */
+/* 同一天的事件排序：無時間置頂，有時間依開始時間，無時間之間依筆畫順序 */
+const strokeCo = (() => { try { return new Intl.Collator('zh-u-co-stroke'); } catch (e) { return new Intl.Collator('zh'); } })();
+function cmpSeg(x, y) {
+  if (x.cs !== y.cs) return x.cs - y.cs;
+  const xt = x.t.st || '', yt = y.t.st || '';
+  if (!xt !== !yt) return xt ? 1 : -1;
+  if (xt !== yt) return xt < yt ? -1 : 1;
+  if (y.ce !== x.ce) return y.ce - x.ce;
+  return strokeCo.compare(x.t.text, y.t.text);
+}
+
+/* 事件在目前顯示的列中，最上方那一列負責顯示名稱，其餘列只顯示色條 */
+function primaryOf(t, list) {
+  const r = list.find(x => t.rows.includes(x.id));
+  return r ? r.id : null;
+}
+
+function gridHTML(weeks, isIn, rows, shown) {
+  const todayISO = toISO(new Date());
+  const rowIds = new Set(rows.map(r => r.id));
+  /* 兩個十六進位顏色的中間色 */
+  const hexMix = (a, b) => {
+    if (!/^#[0-9a-f]{6}$/i.test(a) || !/^#[0-9a-f]{6}$/i.test(b)) return a;
+    const pa = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16));
+    const pb = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16));
+    return '#' + pa.map((v, i) => Math.round((v + pb[i]) / 2).toString(16).padStart(2, '0')).join('');
+  };
+  let html = '';
+  for (const w of weeks) {
+    const days = Array.from({ length: 7 }, (_, i) => addDays(w, i));
+    const wS = toISO(days[0]), wE = toISO(days[6]);
+    html += '<div class="week">';
+    html += `<div class="row daterow"><div class="label dlabel"></div><div class="grid dates">${days.map(d => {
+      const iso = toISO(d);
+      const cls = ['dcell'];
+      if (iso === todayISO) cls.push('today');
+      if (!isIn(d)) cls.push('out');
+      const hol = holidayOf(iso);
+      const label = d.getDate() === 1 ? md(d) : d.getDate();
+      const icon = cls.includes('today') ? '<svg class="tday" viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><circle cx="6" cy="6" r="4.4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.7" fill="currentColor"/></svg>' : '';
+      return `<div class="${cls.join(' ')}"><span class="d">${hol ? `<span class="hol" title="${esc(hol)}">${esc(hol)}</span>` : ''}${icon}<span>${label}</span></span></div>`;
+    }).join('')}</div></div>`;
+
+    const items = data.todos
+      .filter(t => t.end >= wS && t.start <= wE && t.rows.some(id => rowIds.has(id)))
+      .map(t => ({
+        t,
+        vis: t.rows.filter(id => rowIds.has(id)),
+        cs: Math.round((parse(t.start > wS ? t.start : wS) - days[0]) / DAY_MS) + 1,
+        ce: Math.round((parse(t.end < wE ? t.end : wE) - days[0]) / DAY_MS) + 2
+      }));
+
+    for (const row of rows) {
+      const c = row.color;
+      const idx = rows.indexOf(row);
+      /* 本列內排層：從上一列延續下來的排最上，本列獨立的居中，往下延續的排在衝突事件之下，讓跨列段落貼在一起 */
+      const rank = it => {
+        const above = rows.some(x => it.t.rows.includes(x.id) && rows.indexOf(x) < idx);
+        const below = rows.some(x => it.t.rows.includes(x.id) && rows.indexOf(x) > idx);
+        return above ? 0 : (below ? 2 : 1);
+      };
+      const ordered = items.filter(it => it.vis.includes(row.id)).sort((x, y) => rank(x) - rank(y) || cmpSeg(x, y));
+      const segs = [];
+      ordered.forEach(sg => {
+        let l = 0;
+        while (segs.some(o => o.lane === l && o.cs < sg.ce && sg.cs < o.ce)) l++;
+        segs.push({ ...sg, lane: l });
+      });
+      const lanesN = segs.reduce((m, sg) => Math.max(m, sg.lane + 1), 1);
+      const tpl = Array(lanesN).fill('auto').join(' ');
+
+      const cells = days.map((d, i) => {
+        const iso = toISO(d);
+        const cls = ['cell'];
+        const we = i >= 5;
+        if (iso === todayISO) cls.push('today');
+        if (!isIn(d)) cls.push('out');
+        const bg = !isIn(d) ? c + '08' : (we ? c + '26' : c + '12');
+        return `<div class="${cls.join(' ')}" data-row="${row.id}" data-date="${iso}" style="grid-column:${i + 1};grid-row:1 / -1;background:${bg}"></div>`;
+      }).join('');
+
+      const bars = segs.map(sg => {
+        const { t, cs, ce, lane } = sg;
+        /* 多列事件用漸層：每段從上一個交界色漸變到下一個交界色，整體連續 */
+        const evRows = rows.filter(r => t.rows.includes(r.id));
+        const n = evRows.length, k = evRows.indexOf(row);
+        const cols = evRows.map(r => r.color);
+        let bg = `${c}59`;
+        if (n > 1) {
+          const bnd = i => hexMix(cols[i], cols[i + 1]);
+          const top = k === 0 ? cols[0] : bnd(k - 1);
+          const bot = k === n - 1 ? cols[n - 1] : bnd(k);
+          bg = `linear-gradient(to bottom, ${top}59, ${c}59 50%, ${bot}59)`;
+        }
+        const hasAbove = rows.some(x => t.rows.includes(x.id) && rows.indexOf(x) < idx);
+        const hasBelow = rows.some(x => t.rows.includes(x.id) && rows.indexOf(x) > idx);
+        /* 往下延續的段落：向下延伸到同列中第一個衝突事件之前，讓色塊貼到列底，與下一列接上 */
+        const span = hasBelow
+          ? segs.reduce((last, o) => (o !== sg && o.lane > lane && o.cs < ce && cs < o.ce ? Math.min(last, o.lane - 1) : last), lanesN - 1)
+          : lane;
+        /* 下列的條往上多蓋 1px，把兩列之間的分隔線蓋住，讓多列事件連成一體 */
+        const ext = (hasAbove ? 'margin-top:-1px;border-top-left-radius:0;border-top-right-radius:0;min-height:22px;' : '')
+          + (hasBelow ? 'margin-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0;' : '');
+        const plus = t.note ? `<span class="nplus" data-nplus="${t.id}">+</span>` : '';
+        const tnote = t.note && openNotes.has(t.id) ? `<div class="tnote">${esc(t.note).replace(/\n/g, '<br>')}</div>` : '';
+        const text = hasAbove ? '' : `<div>${t.st ? `<span class="tm">${esc(t.st)}</span> ` : ''}${esc(t.text)}${plus}</div>${t.loc ? `<div class="loc">${esc(t.loc)}</div>` : ''}${tnote}`;
+        return `<div class="bar" data-todo="${t.id}" style="grid-column:${cs}/${ce};grid-row:${lane + 1} / ${span + 2};background:${bg};border-left-color:${c};${ext}" title="${esc(t.text + (t.loc ? ' · ' + t.loc : ''))}">${text}</div>`;
+      }).join('');
+
+      html += `<div class="row">
+        <div class="label${row.depth ? ' sub' : ''}" data-rowedit="${row.id}" style="background:${c}30;padding-left:${6 + row.depth * 8}px">${esc(row.name)}${rowNoteHTML(row, shown)}</div>
+        <div class="grid lanes" style="grid-template-rows:${tpl}">${cells}${bars}</div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  return html;
+}
+
+function boardInner(weeks, isIn, rows, shown) {
+  const head = `<div class="dhead"><div></div><div class="days">${DAYS.map(n => `<div class="dayname">${n}</div>`).join('')}</div></div>`;
+  return head + gridHTML(weeks, isIn, rows, shown) + (rows.length ? '' : '<div class="empty">沒有列</div>');
+}
+
+function render() {
+  $('title').textContent = titleFor(view, anchor);
+  $('board').innerHTML = boardInner(weeksFor(view, anchor), d => inPeriod(d, view, anchor), flatRows(false), new Set());
+  $('notePeriod').innerHTML = data.notes.filter(n => n.scope === 'period' && n.target === periodKey(view, anchor)).map(noteHTML).join('');
+  $('noteAll').innerHTML = data.notes.filter(n => n.scope === 'all').map(noteHTML).join('');
+  document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === view));
+}
+
+function step(dir) {
+  if (view === 'month') anchor = new Date(anchor.getFullYear(), anchor.getMonth() + dir, 1);
+  else if (view === 'year') anchor = new Date(anchor.getFullYear() + dir, 0, 1);
+  else anchor = addDays(anchor, 7 * dir);
+  render();
+}
+
+/* 介面大小與寬度設定 */
+function applyUI() {
+  const root = document.documentElement.style;
+  root.setProperty('--fs', ui.fs + 'px');
+  $('fsz').value = ui.fs;
+  $('holTog').checked = ui.holidays !== false;
+  const max = Math.max(320, window.innerWidth - 24);
+  $('wid').max = max;
+  const w = ui.w ? Math.min(ui.w, max) : max;
+  $('wid').value = w;
+  root.setProperty('--maxw', w + 'px');
+}
+$('fsz').addEventListener('input', e => { ui.fs = +e.target.value; saveUI(); applyUI(); });
+$('wid').addEventListener('input', e => { ui.w = +e.target.value; saveUI(); applyUI(); });
+window.addEventListener('resize', applyUI);
+$('holTog').addEventListener('change', e => { ui.holidays = e.target.checked; saveUI(); render(); });
+
+function rowOptions(selected) {
+  return flatRows(true).map(r =>
+    `<option value="${r.id}"${r.id === selected ? ' selected' : ''}>${'　'.repeat(r.depth)}${esc(r.name)}${r.hidden ? '（隱藏）' : ''}</option>`).join('');
+}
+
+function rowChecks(selected) {
+  return flatRows(true).map(r =>
+    `<label class="chkrow" style="padding-left:${r.depth * 14}px"><input class="chk" type="checkbox" value="${r.id}"${selected.includes(r.id) ? ' checked' : ''}>${esc(r.name)}${r.hidden ? '（隱藏）' : ''}</label>`).join('');
+}
+
+function openDlg(todo, pos) {
+  editingId = todo ? todo.id : null;
+  ctxPos = pos || null;
+  const t = todo || { text: '', loc: '', start: pos.date, end: pos.date, rows: [pos.row], st: '', et: '' };
+  $('fText').value = t.text;
+  $('fLoc').value = t.loc || '';
+  $('fNote').value = t.note || '';
+  $('fStart').value = t.start;
+  $('fEnd').value = t.end;
+  $('fSt').value = t.st || '';
+  $('fEt').value = t.et || '';
+  $('fRows').innerHTML = rowChecks(t.rows);
+  $('fDel').hidden = !todo;
+  $('fAdd').hidden = !todo;
+  $('mask').hidden = false;
+  $('fText').focus();
+}
+/* 找出指標位置下方的格子（事件條蓋住格子時使用） */
+function posUnder(e) {
+  const c = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('cell'));
+  return c ? { row: c.dataset.row, date: c.dataset.date } : null;
+}
+/* 拖曳事件條到其他格子：平移日期；單列事件可換到目標列 */
+function moveTodo(id, from, to) {
+  const t = data.todos.find(x => x.id === id);
+  if (!t) return;
+  const shift = Math.round((parse(to.date) - parse(from.date)) / DAY_MS);
+  const rowChange = t.rows.length === 1 && to.row !== from.row;
+  if (!shift && !rowChange) return;
+  t.start = toISO(addDays(parse(t.start), shift));
+  t.end = toISO(addDays(parse(t.end), shift));
+  if (rowChange) t.rows = [to.row];
+  save(); render();
+}
+$('board').addEventListener('pointerdown', e => {
+  if (e.button !== 0 || e.target.closest('[data-nplus]')) return;
+  const bar = e.target.closest('[data-todo]');
+  if (!bar) return;
+  drag = { id: bar.dataset.todo, x: e.clientX, y: e.clientY, grab: posUnder(e), el: bar, on: false };
+});
+document.addEventListener('pointermove', e => {
+  if (!drag) return;
+  if (!drag.on) {
+    if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+    drag.on = true;
+    drag.el.classList.add('dragging');
+  }
+});
+document.addEventListener('pointerup', e => {
+  if (!drag) return;
+  const d = drag;
+  drag = null;
+  if (!d.on) return;
+  d.el.classList.remove('dragging');
+  suppressClick = true;
+  setTimeout(() => { suppressClick = false; }, 150);
+  const to = posUnder(e);
+  if (to && d.grab) moveTodo(d.id, d.grab, to);
+});
+
+function closeDlg() { $('mask').hidden = true; editingId = null; }
+
+function openRowDlg(id, parent) {
+  rowEdit = { id: id || null, parent: parent || null };
+  const r = id ? data.rows.find(x => x.id === id) : null;
+  rowColorSel = r ? r.color : nextColor();
+  $('rTitle').textContent = r ? '編輯列' : (parent ? '新增子列' : '新增列');
+  $('rName').value = r ? r.name : (parent ? '新子列' : '新列');
+  $('rColors').innerHTML = PALETTE.map(c =>
+    `<button type="button" class="pc${c === rowColorSel ? ' on' : ''}" data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join('');
+  $('rDel').hidden = !r;
+  $('rAddChild').hidden = !r;
+  $('rmask').hidden = false;
+  $('rName').focus();
+  $('rName').select();
+}
+function closeRowDlg() { $('rmask').hidden = true; rowEdit = null; }
+
+let vOrder = [];
+
+function openVis() {
+  vOrder = flatRows(true).map(r => ({ id: r.id, depth: r.depth, show: !r.hidden }));
+  renderVis();
+  $('vmask').hidden = false;
+}
+
+function renderVis() {
+  $('vList').innerHTML = vOrder.length
+    ? vOrder.map(it => {
+        const r = data.rows.find(x => x.id === it.id);
+        return `<div class="vrow" style="padding-left:${it.depth * 14}px"><label class="chkrow"><input class="chk" type="checkbox" data-show="${it.id}"${it.show ? ' checked' : ''}>${esc(r.name)}</label><span class="mv"><button type="button" class="x" data-up="${it.id}" title="上移">↑</button><button type="button" class="x" data-down="${it.id}" title="下移">↓</button></span></div>`;
+      }).join('')
+    : '<div class="hint">沒有列</div>';
+}
+
+/* 把畫面上的勾選狀態同步回 vOrder */
+function syncVis() {
+  $('vList').querySelectorAll('[data-show]').forEach(b => {
+    const it = vOrder.find(x => x.id === b.dataset.show);
+    if (it) it.show = b.checked;
+  });
+}
+
+/* 以整個子樹為單位上下移動，只在同一父層內交換 */
+function moveVis(id, dir) {
+  syncVis();
+  const i = vOrder.findIndex(x => x.id === id);
+  if (i < 0) return;
+  const d = vOrder[i].depth;
+  const blockEnd = k => { let j = k + 1; while (j < vOrder.length && vOrder[j].depth > vOrder[k].depth) j++; return j; };
+  if (dir < 0) {
+    let k = i - 1;
+    while (k >= 0 && vOrder[k].depth > d) k--;
+    if (k < 0 || vOrder[k].depth !== d) return;
+    const e = blockEnd(i);
+    vOrder = [...vOrder.slice(0, k), ...vOrder.slice(i, e), ...vOrder.slice(k, i), ...vOrder.slice(e)];
+  } else {
+    const e = blockEnd(i);
+    if (e >= vOrder.length || vOrder[e].depth !== d) return;
+    const e2 = blockEnd(e);
+    vOrder = [...vOrder.slice(0, i), ...vOrder.slice(e, e2), ...vOrder.slice(i, e), ...vOrder.slice(e2)];
+  }
+  renderVis();
+}
+
+$('vList').addEventListener('click', e => {
+  const up = e.target.closest('[data-up]');
+  if (up) { moveVis(up.dataset.up, -1); return; }
+  const dn = e.target.closest('[data-down]');
+  if (dn) moveVis(dn.dataset.down, 1);
+});
+function closeVis() { $('vmask').hidden = true; }
+
+function openPrint() {
+  const m = monthStr(anchor);
+  $('pFrom').value = m;
+  $('pTo').value = m;
+  $('pRows').innerHTML = flatRows(true).map(r =>
+    `<label class="chkrow" style="padding-left:${r.depth * 14}px"><input class="chk" type="checkbox" value="${r.id}" checked>${esc(r.name)}</label>`).join('');
+  $('pmask').hidden = false;
+}
+function closePrint() { $('pmask').hidden = true; }
+
+function doPrint() {
+  const ids = [...$('pRows').querySelectorAll('input:checked')].map(i => i.value);
+  if (!ids.length) return;
+  if (!$('pFrom').value || !$('pTo').value) return;
+  const from = monthStart($('pFrom').value), to = monthEnd($('pTo').value);
+  if (to < from) { alert('結束月份要晚於或等於開始月份'); return; }
+  const rows = flatRows(true).filter(r => ids.includes(r.id));
+  const isIn = d => d >= from && d <= to;
+  const weeks = [];
+  for (let w = mondayOf(from); w <= to; w = addDays(w, 7)) weeks.push(w);
+
+  const pNotes = $('pNotes').value;
+  const shown = pNotes === 'pos' ? new Set() : null;
+  const yearKeys = [];
+  for (let y = from.getFullYear(); y <= to.getFullYear(); y++) yearKeys.push('Y:' + y);
+  const notesOf = keys => (pNotes === 'pos' ? notesBlock(periodNotes(keys)) : '');
+  let html;
+  if ($('pLayout').value === 'paged') {
+    html = '';
+    const months = [];
+    for (let m = new Date(from.getFullYear(), from.getMonth(), 1); m <= to; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) months.push(m);
+    months.forEach((m, idx) => {
+      const wk = weeks.filter(w => {
+        const th = addDays(w, 3);
+        const ref = th < from ? from : (th > to ? to : th);
+        return ref.getFullYear() === m.getFullYear() && ref.getMonth() === m.getMonth();
+      });
+      html += `<div class="pmonth"><div class="ptitle">${m.getFullYear()} 年 ${m.getMonth() + 1} 月</div>${notesOf([`M:${monthStr(m)}`, ...wk.map(w => 'W:' + toISO(w)), ...(idx === 0 ? yearKeys : [])])}<div class="board">${boardInner(wk, isIn, rows, shown)}</div></div>`;
+    });
+  } else {
+    const title = `${from.getFullYear()} 年 ${from.getMonth() + 1} 月 – ${to.getFullYear()} 年 ${to.getMonth() + 1} 月`;
+    html = `<div class="ptitle">${title}</div>${notesOf([...yearKeys, ...periodKeysIn(from, to)])}<div class="board">${boardInner(weeks, isIn, rows, shown)}</div>`;
+  }
+  if (pNotes !== 'none') html += endNotesHTML(ids, from, to, pNotes === 'pos');
+  $('print').innerHTML = html;
+  closePrint();
+  window.print();
+}
+
+function exportJSON() {
+  const out = { format: FORMAT, version: 3, exportedAt: new Date().toISOString(), rows: data.rows, todos: data.todos, customHolidays: data.customHolidays, notes: data.notes };
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `行事曆-${toISO(new Date())}.json`;
+  a.click();
+  ui.lastExport = Date.now(); saveUI(); updateBk();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* ---------- ICS 匯出（可匯入 Google 日曆） ---------- */
+
+function icsEsc(s) {
+  return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+}
+
+/* 依 UTF-8 位元組將長行折行為 75 位元組以內，續行以空白開頭 */
+function icsFold(line) {
+  const enc = new TextEncoder();
+  const out = [];
+  let cur = '', bytes = 0;
+  for (const ch of line) {
+    const b = enc.encode(ch).length;
+    if (bytes + b > 75) { out.push(cur); cur = ' ' + ch; bytes = 1 + b; }
+    else { cur += ch; bytes += b; }
+  }
+  out.push(cur);
+  return out.join('\r\n');
+}
+
+/* 台北時間的日期與 HH:MM 轉為 UTC 時間戳記 */
+function utcStamp(dateISO, hm) {
+  const [y, m, d] = dateISO.split('-').map(Number);
+  const [h, mi] = hm.split(':').map(Number);
+  const x = new Date(Date.UTC(y, m - 1, d, h - 8, mi));
+  return `${x.getUTCFullYear()}${pad(x.getUTCMonth() + 1)}${pad(x.getUTCDate())}T${pad(x.getUTCHours())}${pad(x.getUTCMinutes())}00Z`;
+}
+
+function exportICS(ids) {
+  const now = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const rowName = Object.fromEntries(data.rows.map(r => [r.id, r.name]));
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//weekly-board//TW//',
+    'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'X-WR-CALNAME:' + icsEsc('行事曆'), 'X-WR-TIMEZONE:Asia/Taipei'
+  ];
+  const list = ids ? data.todos.filter(t => t.rows.some(x => ids.includes(x))) : data.todos;
+  for (const t of list) {
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:' + (t.src || `${t.id}@weekly-board`));
+    lines.push('DTSTAMP:' + now);
+    if (t.st) {
+      const [sh, sm] = t.st.split(':').map(Number);
+      const endHM = t.et || (() => { const tot = Math.min(sh * 60 + sm + 60, 23 * 60 + 59); return `${pad(Math.floor(tot / 60))}:${pad(tot % 60)}`; })();
+      lines.push('DTSTART:' + utcStamp(t.start, t.st));
+      lines.push('DTEND:' + utcStamp(t.et ? t.end : t.start, endHM));
+    } else {
+      lines.push('DTSTART;VALUE=DATE:' + t.start.replace(/-/g, ''));
+      lines.push('DTEND;VALUE=DATE:' + toISO(addDays(parse(t.end), 1)).replace(/-/g, ''));
+    }
+    lines.push('SUMMARY:' + icsEsc(t.text));
+    if (t.loc) lines.push('LOCATION:' + icsEsc(t.loc));
+    const names = t.rows.filter(x => !ids || ids.includes(x)).map(x => rowName[x]).filter(Boolean);
+    if (names.length) lines.push('CATEGORIES:' + names.map(icsEsc).join(','));
+    lines.push('END:VEVENT');
+  }
+  lines.push('END:VCALENDAR');
+  const body = lines.map(icsFold).join('\r\n') + '\r\n';
+  const blob = new Blob([body], { type: 'text/calendar;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `行事曆-${toISO(new Date())}.ics`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function openIcsExport() {
+  $('eList').innerHTML = flatRows(true).map(r =>
+    `<label class="chkrow" style="padding-left:${r.depth * 14}px"><input class="chk" type="checkbox" value="${r.id}" checked>${esc(r.name)}</label>`).join('')
+    || '<div class="hint">沒有列</div>';
+  $('emask').hidden = false;
+}
+function closeIcsExport() { $('emask').hidden = true; }
+
+$('eform').addEventListener('submit', e => {
+  e.preventDefault();
+  const ids = [...$('eList').querySelectorAll('input:checked')].map(i => i.value);
+  if (!ids.length) return;
+  closeIcsExport();
+  exportICS(ids);
+});
+$('eCancel').onclick = closeIcsExport;
+$('emask').addEventListener('mousedown', e => { if (e.target === $('emask')) closeIcsExport(); });
+
+/* ---------- ICS（Google 日曆等）匯入 ---------- */
+
+function unfold(text) { return text.replace(/\r?\n[ \t]/g, ''); }
+function unesc(s) { return String(s).replace(/\\n/gi, '\n').replace(/\\([,;\\])/g, '$1'); }
+
+function parseICS(text) {
+  const lines = unfold(text).split(/\r?\n/);
+  let cal = '', cur = null;
+  const events = [];
+  for (const line of lines) {
+    if (line === 'BEGIN:VEVENT') { cur = {}; continue; }
+    if (line === 'END:VEVENT') { if (cur) events.push(cur); cur = null; continue; }
+    const idx = line.indexOf(':');
+    if (idx < 0) continue;
+    const name = line.slice(0, idx).split(';')[0].toUpperCase();
+    const val = line.slice(idx + 1);
+    if (!cur) { if (name === 'X-WR-CALNAME') cal = unesc(val).trim(); continue; }
+    cur[name] = { val };
+  }
+  return { cal, events };
+}
+
+function icsDate(p) {
+  const v = p.val.trim();
+  if (/^\d{8}$/.test(v)) return { iso: `${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`, allDay: true };
+  const m = v.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z?)$/);
+  if (!m) return null;
+  if (m[7] === 'Z') {
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4] + 8, +m[5], +m[6]));
+    return { iso: `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`, allDay: false };
+  }
+  return { iso: `${m[1]}-${m[2]}-${m[3]}`, allDay: false };
+}
+
+/* 回傳台北時間的 HH:MM，全天事件回傳空字串 */
+function icsTime(p) {
+  const m = p.val.trim().match(/^(\d{8})T(\d{2})(\d{2})\d{2}(Z?)$/);
+  if (!m) return '';
+  if (m[4] === 'Z') {
+    const d = new Date(Date.UTC(+m[1].slice(0, 4), +m[1].slice(4, 6) - 1, +m[1].slice(6, 8), +m[2] + 8, +m[3]));
+    return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+  }
+  return `${m[2]}:${m[3]}`;
+}
+
+function openIcs(text) {
+  const { cal, events } = parseICS(text);
+  const bySrc = new Map(data.todos.filter(t => t.src).map(t => [t.src, t]));
+  const seen = new Set();
+  const items = [];
+  const updates = [];
+  let same = 0;
+  for (const ev of events) {
+    if (ev.STATUS && /CANCELLED/i.test(ev.STATUS.val)) continue;
+    const s = ev.DTSTART && icsDate(ev.DTSTART);
+    if (!s) continue;
+    let end = s.iso;
+    const e = ev.DTEND && icsDate(ev.DTEND);
+    if (e) {
+      end = e.iso;
+      if (s.allDay && e.allDay) end = toISO(addDays(parse(e.iso), -1));
+      if (end < s.iso) end = s.iso;
+    }
+    const src = ev.UID ? ev.UID.val.trim() : '';
+    if (src && seen.has(src)) continue;
+    if (src) seen.add(src);
+    items.push({
+      text: unesc(ev.SUMMARY ? ev.SUMMARY.val : '').trim() || '(無標題)',
+      loc: ev.LOCATION ? unesc(ev.LOCATION.val).trim() : '',
+      start: s.iso,
+      end,
+      src,
+      st: s.allDay ? '' : icsTime(ev.DTSTART),
+      et: e && !e.allDay ? icsTime(ev.DTEND) : ''
+    });
+  }
+  const fresh = [];
+  items.forEach(it => {
+    const old = it.src && bySrc.get(it.src);
+    if (!old) { fresh.push(it); return; }
+    if (old.text === it.text && (old.loc || '') === it.loc && old.start === it.start && old.end === it.end
+      && (old.st || '') === it.st && (old.et || '') === it.et) { same++; return; }
+    updates.push({ todo: old, data: it });
+  });
+  pendingIcs = { cal, items: fresh, updates };
+  const parts = [];
+  if (fresh.length) parts.push(`新增 ${fresh.length} 筆`);
+  if (updates.length) parts.push(`更新 ${updates.length} 筆`);
+  if (same) parts.push(`${same} 筆無變動`);
+  $('iInfo').textContent = parts.length ? parts.join('，') : '沒有可匯入的事項';
+  $('iGo').disabled = !fresh.length && !updates.length;
+  $('iRow').innerHTML = `<option value="__new">新增一列：${esc(cal || '匯入的行事曆')}</option>` + rowOptions(null);
+  $('imask').hidden = false;
+}
+function closeImport() { $('imask').hidden = true; pendingIcs = null; }
+
+$('iform').addEventListener('submit', e => {
+  e.preventDefault();
+  if (!pendingIcs || (!pendingIcs.items.length && !pendingIcs.updates.length)) return;
+  let row = $('iRow').value;
+  if (row === '__new' && pendingIcs.items.length) {
+    const r = { id: uid(), name: pendingIcs.cal || '匯入的行事曆', parent: null, color: nextColor(), hidden: false };
+    data.rows.push(r);
+    row = r.id;
+  }
+  pendingIcs.items.forEach(it => {
+    data.todos.push({ id: uid(), rows: [row], start: it.start, end: it.end, text: it.text, loc: it.loc, src: it.src, st: it.st, et: it.et });
+  });
+  pendingIcs.updates.forEach(u => Object.assign(u.todo, { text: u.data.text, loc: u.data.loc, start: u.data.start, end: u.data.end, st: u.data.st, et: u.data.et }));
+  save(); closeImport(); render();
+});
+$('iCancel').onclick = closeImport;
+$('imask').addEventListener('mousedown', e => { if (e.target === $('imask')) closeImport(); });
+
+/* ---------- JSON 匯入 ---------- */
+
+async function importFile(file) {
+  const text = await file.text();
+  if (/BEGIN:VCALENDAR/i.test(text)) { openIcs(text); return; }
+  let obj;
+  try { obj = JSON.parse(text); } catch (e) { alert('檔案無法讀取'); return; }
+  if (!obj || obj.format !== FORMAT || !Array.isArray(obj.rows) || !Array.isArray(obj.todos)) {
+    alert('這不是可辨識的行事曆檔案');
+    return;
+  }
+  if (!confirm('以此檔取代目前的資料？')) return;
+  const rows = obj.rows
+    .filter(r => r && r.id && r.name)
+    .map((r, i) => ({
+      id: String(r.id),
+      name: String(r.name),
+      parent: r.parent ? String(r.parent) : null,
+      color: COLOR_RE.test(r.color) ? r.color : PALETTE[i % PALETTE.length],
+      hidden: !!r.hidden
+    }));
+  const ids = new Set(rows.map(r => r.id));
+  rows.forEach(r => { if (r.parent && !ids.has(r.parent)) r.parent = null; });
+  const todos = obj.todos
+    .filter(t => t && typeof t === 'object')
+    .map(t => ({ ...t, rows: (Array.isArray(t.rows) ? t.rows : [t.row]).map(String).filter(x => ids.has(x)) }))
+    .filter(t => t.rows.length && DATE_RE.test(t.start) && DATE_RE.test(t.end) && t.text)
+    .map(t => ({
+      id: t.id ? String(t.id) : uid(),
+      rows: t.rows,
+      start: t.start,
+      st: t.st || '',
+      et: t.et || '',
+      end: t.end,
+      text: String(t.text),
+      loc: t.loc ? String(t.loc) : '',
+      src: t.src ? String(t.src) : undefined
+    }));
+  const notes = Array.isArray(obj.notes)
+    ? obj.notes.filter(n => n && n.id && n.text && ['all', 'row', 'period'].includes(n.scope))
+      .map(n => ({ id: String(n.id), text: String(n.text), scope: n.scope, target: n.target ? String(n.target) : '' }))
+    : [];
+  data = { rows, todos, customHolidays: (obj.customHolidays && typeof obj.customHolidays === 'object') ? obj.customHolidays : {}, notes };
+  save(); render();
+}
+
+$('form').addEventListener('submit', e => {
+  e.preventDefault();
+  const text = $('fText').value.trim();
+  if (!text) { $('fText').focus(); return; }
+  let s = $('fStart').value, en = $('fEnd').value;
+  if (!s) { $('fStart').focus(); return; }
+  if (!en) en = s;
+  if (en < s) [s, en] = [en, s];
+  const loc = $('fLoc').value.trim();
+  const note = $('fNote').value.trim();
+  const rowsSel = [...$('fRows').querySelectorAll('input:checked')].map(i => i.value);
+  if (!rowsSel.length) { alert('請至少選擇一列'); return; }
+  const st = $('fSt').value, et = $('fEt').value;
+  if (editingId) {
+    const t = data.todos.find(x => x.id === editingId);
+    if (t) Object.assign(t, { text, loc, note, start: s, end: en, rows: rowsSel, st, et });
+  } else {
+    data.todos.push({ id: uid(), rows: rowsSel, start: s, end: en, text, loc, note, st, et });
+  }
+  save(); closeDlg(); render();
+});
+
+$('fDel').onclick = () => {
+  data.todos = data.todos.filter(t => t.id !== editingId);
+  save(); closeDlg(); render();
+};
+$('fCancel').onclick = closeDlg;
+/* 在編輯框中新增事件：沿用點擊的那一格 */
+$('fAdd').onclick = () => {
+  const cur = data.todos.find(x => x.id === editingId);
+  const pos = ctxPos || (cur ? { row: cur.rows[0], date: cur.start } : null);
+  closeDlg();
+  if (pos) openDlg(null, pos);
+};
+$('mask').addEventListener('mousedown', e => { if (e.target === $('mask')) closeDlg(); });
+
+$('rform').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('rName').value.trim() || '未命名';
+  if (rowEdit.id) {
+    const r = data.rows.find(x => x.id === rowEdit.id);
+    if (r) { r.name = name; r.color = rowColorSel; }
+  } else {
+    data.rows.push({ id: uid(), name, parent: rowEdit.parent, color: rowColorSel, hidden: false });
+  }
+  save(); closeRowDlg(); render();
+});
+
+$('rColors').addEventListener('click', e => {
+  const b = e.target.closest('.pc');
+  if (!b) return;
+  rowColorSel = b.dataset.c;
+  $('rColors').querySelectorAll('.pc').forEach(x => x.classList.toggle('on', x === b));
+});
+
+$('rCancel').onclick = closeRowDlg;
+$('rAddChild').onclick = () => { const pid = rowEdit.id; closeRowDlg(); openRowDlg(null, pid); };
+$('rDel').onclick = () => {
+  const r = data.rows.find(x => x.id === rowEdit.id);
+  if (!r) return;
+  const ids = descIds(r.id);
+  const nTodo = data.todos.filter(t => t.rows.every(x => ids.includes(x))).length;
+  const msg = ids.length > 1
+    ? `刪除「${r.name}」及其下 ${ids.length - 1} 個子列，共 ${nTodo} 個事項？`
+    : `刪除「${r.name}」以及這列的 ${nTodo} 個事項？`;
+  if (!confirm(msg)) return;
+  data.rows = data.rows.filter(x => !ids.includes(x.id));
+  data.todos.forEach(t => { t.rows = t.rows.filter(x => !ids.includes(x)); });
+  data.todos = data.todos.filter(t => t.rows.length);
+  data.notes = data.notes.filter(n => !(n.scope === 'row' && ids.includes(n.target)));
+  save(); closeRowDlg(); render();
+};
+$('rmask').addEventListener('mousedown', e => { if (e.target === $('rmask')) closeRowDlg(); });
+
+$('vform').addEventListener('submit', e => {
+  e.preventDefault();
+  syncVis();
+  vOrder.forEach(it => {
+    const r = data.rows.find(x => x.id === it.id);
+    if (r) r.hidden = !it.show;
+  });
+  const pos = new Map(vOrder.map((it, i) => [it.id, i]));
+  data.rows.sort((a, b) => (pos.get(a.id) ?? 0) - (pos.get(b.id) ?? 0));
+  save(); closeVis(); render();
+});
+$('vCancel').onclick = closeVis;
+$('vmask').addEventListener('mousedown', e => { if (e.target === $('vmask')) closeVis(); });
+
+$('pmask').addEventListener('mousedown', e => { if (e.target === $('pmask')) closePrint(); });
+$('pCancel').onclick = closePrint;
+$('pGo').onclick = doPrint;
+$('fileBtn').onclick = () => { $('fmask').hidden = false; };
+function closeFile() { $('fmask').hidden = true; }
+$('fmask').addEventListener('mousedown', e => { if (e.target === $('fmask')) closeFile(); });
+$('fmask').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  closeFile();
+  const act = b.dataset.act;
+  if (act === 'import') $('fileIn').click();
+  else if (act === 'json') exportJSON();
+  else if (act === 'ics') openIcsExport();
+  else if (act === 'print') openPrint();
+});
+$('visBtn').onclick = openVis;
+function updateBk() {
+  const now = Date.now();
+  const days = ui.lastExport ? (now - ui.lastExport) / DAY_MS : Infinity;
+  const due = data.todos.length > 0 && days >= 7 && (!ui.snoozeUntil || now > ui.snoozeUntil);
+  $('bk').hidden = !due;
+  $('bkText').textContent = ui.lastExport
+    ? `距上次匯出已 ${Math.floor(days)} 天，建議備份一次。`
+    : '尚未匯出過資料，建議備份一次。';
+}
+$('bkGo').onclick = () => exportJSON();
+$('bkLater').onclick = () => { ui.snoozeUntil = Date.now() + DAY_MS; saveUI(); updateBk(); };
+$('fileIn').onchange = e => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (f) importFile(f);
+};
+/* 電腦版：左右鍵切換上一頁、下一頁；對話框開啟或焦點在輸入欄位時不作用 */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  if (document.querySelector('.mask:not([hidden])')) return;
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (['input', 'textarea', 'select'].includes(tag) || e.target.isContentEditable) return;
+  e.preventDefault();
+  step(e.key === 'ArrowLeft' ? -1 : 1);
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!$('mask').hidden) closeDlg();
+  if (!$('rmask').hidden) closeRowDlg();
+  if (!$('vmask').hidden) closeVis();
+  if (!$('imask').hidden) closeImport();
+  if (!$('emask').hidden) closeIcsExport();
+  if (!$('fmask').hidden) closeFile();
+  if (!$('nmask').hidden) closeNote();
+  if (!$('pmask').hidden) closePrint();
+});
+
+$('board').addEventListener('click', e => {
+  if (suppressClick) return;
+  const np = e.target.closest('[data-nplus]');
+  if (np) { const id = np.dataset.nplus; if (openNotes.has(id)) openNotes.delete(id); else openNotes.add(id); render(); return; }
+  const nt = e.target.closest('[data-note]');
+  if (nt) { const n = data.notes.find(x => x.id === nt.dataset.note); if (n) openNote(n); return; }
+  const lb = e.target.closest('[data-rowedit]');
+  if (lb) { openRowDlg(lb.dataset.rowedit, null); return; }
+  const bar = e.target.closest('[data-todo]');
+  if (bar) { openDlg(data.todos.find(t => t.id === bar.dataset.todo), posUnder(e)); return; }
+  const cell = e.target.closest('.cell');
+  if (cell) openDlg(null, { row: cell.dataset.row, date: cell.dataset.date });
+});
+
+$('addrow').onclick = () => openRowDlg(null, null);
+$('addnote').onclick = () => openNote(null);
+$('nScope').addEventListener('change', () => fillNoteTargets());
+$('nCancel').onclick = closeNote;
+$('nDel').onclick = () => {
+  data.notes = data.notes.filter(n => n.id !== noteEdit);
+  save(); closeNote(); render();
+};
+$('nmask').addEventListener('mousedown', e => { if (e.target === $('nmask')) closeNote(); });
+$('nform').addEventListener('submit', e => {
+  e.preventDefault();
+  const text = $('nText').value.trim();
+  if (!text) { $('nText').focus(); return; }
+  const scope = $('nScope').value;
+  const target = scope === 'all' ? '' : $('nTarget').value;
+  const n = noteEdit ? data.notes.find(x => x.id === noteEdit) : null;
+  if (n) Object.assign(n, { text, scope, target });
+  else data.notes.push({ id: uid(), text, scope, target });
+  save(); closeNote(); render();
+});
+['notePeriod', 'noteAll'].forEach(id => $(id).addEventListener('click', e => {
+  const nt = e.target.closest('[data-note]');
+  if (!nt) return;
+  const n = data.notes.find(x => x.id === nt.dataset.note);
+  if (n) openNote(n);
+}));
+
+$('prev').onclick = () => step(-1);
+$('next').onclick = () => step(1);
+$('today').onclick = () => {
+  anchor = new Date();
+  render();
+  /* 年檢視下整年的週都在同一頁，捲動到今天所在的那一週 */
+  if (view === 'year') {
+    const t = document.querySelector('#board .dcell.today');
+    if (t) t.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+};
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => { view = b.dataset.view; render(); });
+
+applyUI();
+updateBk();
+render();
+</script>
+</body>
+</html>
