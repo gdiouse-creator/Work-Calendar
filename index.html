@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -12,6 +13,8 @@
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:var(--fs)}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:20px 12px 56px}
 .credit{font-size:12px;color:#b3bab5;margin:0 0 6px;line-height:1.5}
+.brand{font-size:20px;font-weight:700;margin:4px 0 2px;letter-spacing:.08em;color:var(--ink)}
+@media print{.brand{display:none}}
 .credit a{color:#b3bab5;text-decoration:underline;text-underline-offset:2px}
 .credit a:hover{color:#8a938e}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:30;background:var(--bg);padding:10px 0 8px}
@@ -30,6 +33,8 @@ button:hover{border-color:#c9c7bf}
 .appear label{display:flex;align-items:center;gap:10px}
 .appear input[type=range]{flex:1;min-width:0}
 .sechead{font-size:13px;color:var(--muted);margin:0 0 6px}
+.secrow{display:flex;align-items:center;justify-content:space-between}
+.bulk button{font-size:12px;padding:2px 8px;margin-left:6px}
 .dlabel{background:#fbfaf7;cursor:default;pointer-events:none}
 .dates{background:#fff}
 .bar.dragging{opacity:.55}
@@ -39,6 +44,7 @@ button:hover{border-color:#c9c7bf}
 .dcell:first-child{border-left:none}
 .dcell .d{font-size:calc(var(--fs) - 2px)}
 .dcell.out .d{opacity:.45}
+.dcell.today,.cell.today{box-shadow:inset 0 0 0 1px var(--accent)}
 .lanes{min-height:34px}
 .board{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .dhead,.row{display:grid;grid-template-columns:120px minmax(0,1fr)}
@@ -82,6 +88,8 @@ button:hover{border-color:#c9c7bf}
 .dlg label[hidden]{display:none}
 .mask{position:fixed;inset:0;background:rgba(40,48,44,.22);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
 .mask[hidden]{display:none}
+.syncState{font-size:12px;color:#7b8580;align-self:center;white-space:nowrap}
+.syncState.err{color:#b4543c}
 .dlg{background:#fff;border-radius:14px;padding:20px;width:min(380px,100%);box-shadow:0 10px 40px rgba(0,0,0,.12);display:grid;gap:12px;max-height:90vh;max-height:90dvh;overflow:auto;overscroll-behavior:contain}
 .dlg label{display:grid;gap:4px;font-size:12px;color:var(--muted)}
 .dlg input:not(.chk),.dlg select{font:inherit;color:var(--ink);padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fff}
@@ -124,11 +132,12 @@ button:hover{border-color:#c9c7bf}
   .two{grid-template-columns:1fr}
 }
 @media print{
-  @page{size:A4 landscape;margin:10mm}
+  @page{size:A4 landscape;margin:0}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   body{background:#fff;font-size:10pt}
+  .phead{font-size:9pt}
   .screen,.mask{display:none!important}
-  #print{display:block}
+  #print{display:block;padding:10mm}
   #print .board{border:none;border-radius:0}
   #print .pmonth{break-after:page}
   #print .pmonth:last-child{break-after:auto}
@@ -138,9 +147,18 @@ button:hover{border-color:#c9c7bf}
   #print .ptable tr{break-inside:avoid}
   #print .ptable td{padding:0;vertical-align:top}
   #print .gpage{break-after:page}
+  #print .gnum{display:inline-block;min-width:14px;height:14px;line-height:14px;border-radius:7px;background:#fff;color:#2e3a34;text-align:center;font-size:10px;font-weight:700;padding:0 3px;margin-right:4px;vertical-align:1px}
   #print .gpage:last-child{break-after:auto}
   #print .gpair{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px}
   #print .gblock{flex:none;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  #print .gcall{margin:8px 0 16px;font-size:12px;line-height:1.45;break-inside:auto}
+  #print .gcall-row{font-weight:700;margin-top:6px;display:flex;align-items:center;gap:6px}
+  #print .gcall-row i{display:inline-block;width:10px;height:10px;border-radius:2px}
+  #print .gcall-item{padding-left:16px;text-indent:-16px;margin-top:2px}
+  #print .gcall-n{display:inline-block;width:16px;text-indent:0;font-weight:700;text-align:right;margin-right:6px}
+  #print .g-calls{position:relative;background:#fff}
+  #print .gcall-i{position:absolute;font-size:12px;line-height:16px;color:#2e3a34}
+  #print .gcall-i .gnum{margin-right:4px}
   #print .ptable tbody tr+tr td{border-top:1px solid var(--line)}
   #print .cell:hover,#print .label:hover,#print .bar:hover{filter:none}
 }
@@ -164,7 +182,9 @@ button:hover{border-color:#c9c7bf}
 .g-days{display:flex;flex:none;border-bottom:1px solid var(--line);background:#fff}
 .g-day{flex:none;width:30px;text-align:center;font-size:calc(var(--fs) - 3px);color:var(--muted);padding:4px 0;border-right:1px solid #f0efe9}
 .g-day.we{background:#f6f7f5}
-.g-day.hol{color:#a9b0ac}
+.g-day.hol{color:#a9b0ac;background:#f6f7f5}
+.phead{display:none;text-align:center;font-size:12px;color:#5d6a64;margin-bottom:4px}
+@media print{.phead{display:block}}
 .g-day.today{color:var(--accent);font-weight:700}
 .g-row{display:flex;border-top:1px solid #f0efe9}
 .g-label{width:120px;flex:none;position:sticky;left:0;z-index:4;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;font-weight:600;border-right:1px solid var(--line);cursor:pointer;isolation:isolate;line-height:1.35}
@@ -185,10 +205,13 @@ button:hover{border-color:#c9c7bf}
 .g-rz{position:absolute;right:0;top:0;bottom:0;width:10px;cursor:ew-resize;border-radius:0 5px 5px 0}
 .g-rz:hover{background:rgba(46,58,52,.18)}
 .g-bar{position:absolute;z-index:2;margin:0;height:28px;box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:26px;padding:0 6px;border-left:3px solid;border-radius:5px;cursor:pointer}
+.imp{font-weight:700;color:#9a3b22}
+#print.noimp .imp{font-weight:inherit;color:inherit}
 </style>
 </head>
 <body>
 <div class="wrap screen">
+  <h1 class="brand">狂工曆</h1>
   <div class="credit">製作者楚狂 · <a href="https://leouse.wordpress.com/category/%E5%89%B5%E4%BD%9C/" target="_blank" rel="noopener">更多AI協作效率系統</a></div>
   <div class="top">
     <div class="seg">
@@ -203,6 +226,7 @@ button:hover{border-color:#c9c7bf}
       <button id="today"><svg class="tday" viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><circle cx="6" cy="6" r="4.4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="6" r="1.7" fill="currentColor"/></svg>今天</button>
       <button id="visBtn">顯示列</button>
       <button id="fileBtn">檔案</button>
+      <span id="syncState" class="syncState"></span>
     </div>
   </div>
   <div class="setbar">
@@ -219,6 +243,7 @@ button:hover{border-color:#c9c7bf}
 <div class="mask" id="mask" hidden>
   <form class="dlg" id="form">
     <label>事項<input id="fText" maxlength="120" autocomplete="off"></label>
+    <label class="impl"><input type="checkbox" id="fImp"> 重要事件</label>
     <label>地點<input id="fLoc" maxlength="60" autocomplete="off" placeholder="選填"></label>
     <label>備註<textarea id="fNote" rows="2" maxlength="400" placeholder="選填"></textarea></label>
     <label>進度（0–100，選填）<input type="number" id="fProg" min="0" max="100" step="5" inputmode="numeric" placeholder="未設定"></label>
@@ -270,8 +295,9 @@ button:hover{border-color:#c9c7bf}
     <div class="appear">
       <label>字體 <input type="range" id="fsz" min="11" max="22" step="1"></label>
       <label class="wid">寬度 <input type="range" id="wid" min="320" step="10"></label>
+      <label>版面大小 <input type="range" id="scl" min="70" max="130" step="5"></label>
     </div>
-    <div class="sechead">顯示的列</div>
+    <div class="sechead secrow">顯示的列<span class="bulk"><button type="button" id="vAll">全選</button><button type="button" id="vNone">全不選</button></span></div>
     <div id="vList"></div>
     <div class="acts">
       <span></span>
@@ -368,8 +394,9 @@ button:hover{border-color:#c9c7bf}
         <option value="pos">放在各自位置</option>
       </select>
     </label>
+    <label class="impl"><input type="checkbox" id="pImp"> 強調重要事件</label>
     <div>
-      <div class="hint" style="margin-bottom:6px">列</div>
+      <div class="hint secrow" style="margin-bottom:6px">列<span class="bulk"><button type="button" id="pAll">全選</button><button type="button" id="pNone">全不選</button></span></div>
       <div id="pRows"></div>
     </div>
     <div class="acts">
@@ -473,20 +500,126 @@ if (!data || !Array.isArray(data.rows)) {
     todos: [{ id: uid(), rows: [rowId], start: midISO, end: midISO, text: '直接點擊格子新增、編輯和刪除', loc: '', note: '恭喜你發現按+可以開啟隱藏我', st: '', et: '' }]
   };
 }
-if (!Array.isArray(data.todos)) data.todos = [];
-if (!data.customHolidays) data.customHolidays = {};
-if (!Array.isArray(data.notes)) data.notes = [];
-data.rows.forEach((r, i) => {
-  if (r.parent === undefined) r.parent = null;
-  if (!r.color) r.color = PALETTE[i % PALETTE.length];
-  r.hidden = !!r.hidden;
-});
-data.todos.forEach(t => {
-  if (t.loc === undefined) t.loc = '';
-  if (!Array.isArray(t.rows)) t.rows = t.row ? [t.row] : [];
-  delete t.row;
-});
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} };
+function fixData(d) {
+  const data = d;
+  if (!Array.isArray(data.todos)) data.todos = [];
+  if (!data.customHolidays) data.customHolidays = {};
+  if (!Array.isArray(data.notes)) data.notes = [];
+  data.rows.forEach((r, i) => {
+    if (r.parent === undefined) r.parent = null;
+    if (!r.color) r.color = PALETTE[i % PALETTE.length];
+    r.hidden = !!r.hidden;
+  });
+  data.todos.forEach(t => {
+    if (t.loc === undefined) t.loc = '';
+    if (!Array.isArray(t.rows)) t.rows = t.row ? [t.row] : [];
+    delete t.row;
+  });
+  return d;
+}
+fixData(data);
+
+/* ---- 同步：本機 localStorage 作快取；有 db 能力時以雲端文件為準 ---- */
+const DOC_PATH = 'boards/main';
+const DEV = uid();
+let cloud = null, cloudRev = null, dirty = false, saving = false, pendingPush = false, saveTimer = null, conflictOpen = false, unsubCloud = null;
+const clone = o => JSON.parse(JSON.stringify(o));
+const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} };
+function setSync(text, err) { const el = $('syncState'); if (!el) return; el.textContent = text; el.classList.toggle('err', !!err); }
+const save = () => { saveLocal(); markDirty(); };
+function markDirty() {
+  dirty = true;
+  if (!cloud) { setSync('僅此裝置'); return; }
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(pushCloud, 700);
+}
+async function pushCloud() {
+  if (!cloud || conflictOpen) return;
+  if (saving) { pendingPush = true; return; }
+  saving = true;
+  setSync('同步中…');
+  const sent = JSON.stringify(data);
+  try {
+    const ref = cloud.doc(DOC_PATH);
+    const cur = await ref.get();
+    const curRev = cur.exists ? (cur.data().rev || 0) : 0;
+    if (cur.exists && cloudRev !== null && curRev !== cloudRev) {
+      saving = false;
+      askConflict(cur.data(), curRev);
+      return;
+    }
+    const rev = curRev + 1;
+    await ref.set({ rev, device: DEV, updated: new Date().toISOString(), payload: JSON.parse(sent) });
+    cloudRev = rev;
+    dirty = JSON.stringify(data) !== sent;
+    setSync('已同步');
+  } catch (e) {
+    const big = e && e.code === 'quota_exceeded';
+    setSync(big ? '資料超過上限，請刪減後再試' : '同步失敗，稍後會重試', true);
+    dirty = true;
+    saving = false;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(pushCloud, 5000);
+    return;
+  }
+  saving = false;
+  if (dirty || pendingPush) { pendingPush = false; clearTimeout(saveTimer); saveTimer = setTimeout(pushCloud, 700); }
+}
+function applyRemote(body, rev) {
+  data = fixData(clone(body.payload));
+  cloudRev = rev;
+  dirty = false;
+  saveLocal();
+  render();
+  setSync('已同步');
+}
+function askConflict(body, rev) {
+  if (conflictOpen) return;
+  conflictOpen = true;
+  setSync('等待選擇');
+  const wrap = document.createElement('div');
+  wrap.className = 'mask';
+  const box = document.createElement('div');
+  box.className = 'dlg';
+  box.id = 'conflictBox';
+  const msg = document.createElement('div');
+  msg.textContent = '另一台裝置也改過這份資料。要保留這台的修改，還是改用另一台的版本？';
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
+  const keep = document.createElement('button');
+  keep.className = 'primary';
+  keep.textContent = '保留這台的修改';
+  const take = document.createElement('button');
+  take.textContent = '改用另一台的版本';
+  row.append(keep, take);
+  box.append(msg, row);
+  wrap.append(box);
+  document.body.append(wrap);
+  const close = () => { wrap.remove(); conflictOpen = false; };
+  keep.onclick = () => { close(); cloudRev = rev; pushCloud(); };
+  take.onclick = () => { close(); clearTimeout(saveTimer); applyRemote(body, rev); };
+}
+async function initCloud() {
+  try { cloud = window.claude && window.claude.use ? await window.claude.use('db') : null; } catch (e) { cloud = null; }
+  if (!cloud) { setSync('僅此裝置'); return; }
+  setSync('連線中…');
+  let first = true;
+  unsubCloud = cloud.doc(DOC_PATH).onSnapshot(snap => {
+    if (!snap.exists) {
+      if (first) { first = false; cloudRev = 0; pushCloud(); }
+      return;
+    }
+    first = false;
+    const body = snap.data();
+    const rev = body.rev || 0;
+    if (cloudRev === rev || saving) return;
+    if (dirty) return;
+    applyRemote(body, rev);
+  }, err => {
+    if (err && err.code === 'revoked') setSync('無法同步（權限已變更）', true);
+    else setSync('無法同步，僅此裝置', true);
+  });
+}
 
 let ui;
 try { ui = JSON.parse(localStorage.getItem(UI_KEY)) || {}; } catch (e) { ui = {}; }
@@ -705,7 +838,7 @@ function gridHTML(weeks, isIn, rows, shown) {
         const we = i >= 5;
         if (iso === todayISO) cls.push('today');
         if (!isIn(d)) cls.push('out');
-        const bg = !isIn(d) ? c + '08' : (we ? c + '26' : c + '12');
+        const bg = !isIn(d) ? c + '08' : ((we || holidayOf(iso)) ? c + '26' : c + '12');
         return `<div class="${cls.join(' ')}" data-row="${row.id}" data-date="${iso}" style="grid-column:${i + 1};grid-row:1 / -1;background:${bg}"></div>`;
       }).join('');
 
@@ -734,7 +867,7 @@ function gridHTML(weeks, isIn, rows, shown) {
         const showNote = !!t.note && !closedNotes.has(t.id);
         const plus = t.note ? `<span class="nplus" data-nplus="${t.id}">${showNote ? '−' : '+'}</span>` : '';
         const tnote = showNote ? `<div class="tnote">${esc(t.note).replace(/\n/g, '<br>')}</div>` : '';
-        const text = hasAbove ? '' : `<div>${t.st ? `<span class="tm">${esc(t.st)}</span> ` : ''}${esc(t.text)}${plus}</div>${t.loc ? `<div class="loc">${esc(t.loc)}</div>` : ''}${tnote}`;
+        const text = hasAbove ? '' : `<div class="${t.imp ? 'imp' : ''}">${t.st ? `<span class="tm">${esc(t.st)}</span> ` : ''}${esc(t.text)}${plus}</div>${t.loc ? `<div class="loc">${esc(t.loc)}</div>` : ''}${tnote}`;
         return `<div class="bar" data-todo="${t.id}" style="grid-column:${cs}/${ce};grid-row:${lane + 1} / ${span + 2};background:${bg};border-left-color:${c};${ext}" title="${esc(t.text + (t.loc ? ' · ' + t.loc : ''))}">${text}</div>`;
       }).join('');
 
@@ -823,14 +956,14 @@ function ganttHTML(rows) {
       const iso = toISO(d), we = d.getDay() === 0 || d.getDay() === 6;
       const cls = ['cell', 'g-cell'];
       if (iso === todayISO) cls.push('today');
-      const shade = holidayOf(iso) ? '3a' : (we ? '26' : '12');
+      const shade = (we || holidayOf(iso)) ? '26' : '12';
       return `<div class="${cls.join(' ')}" data-row="${row.id}" data-date="${iso}" style="left:${k * GANTT_DW}px;width:${GANTT_DW}px;background:${c}${shade}"></div>`;
     }).join('');
     const bars = segs.map(({ t, cs, ce, lane, wpx, vert, expanded, nw, barH }) => {
       const left = cs * GANTT_DW + 2;
       const top = laneTop[lane] + 4;
       const head = [...t.text].slice(0, 3).join('');
-      const label = vert ? `<span class="g-vert">${esc(head)}</span>` : `<span class="g-title">${esc(head)}</span>`;
+      const label = vert ? `<span class="g-vert${t.imp ? ' imp' : ''}">${esc(head)}</span>` : `<span class="g-title${t.imp ? ' imp' : ''}">${esc(head)}</span>`;
       const bar = `<div class="bar g-bar${vert ? ' vert' : ''}" data-todo="${t.id}" style="left:${left}px;width:${wpx}px;top:${top}px;height:${barH}px;background:${c}59;border-left-color:${c}" title="${esc(t.text + (t.loc ? ' · ' + t.loc : ''))}">${progFill(t, c)}<span class="g-txt">${label}</span><span class="g-rz" title="拖曳調整結束日"></span></div>`;
       if (!expanded) return bar;
       const note = `<div class="g-note-out" data-nl="${left}" data-nw="${nw}" style="left:${left}px;width:${nw}px;top:${top + barH + 2}px"><b>${t.st ? esc(t.st) + ' ' : ''}${esc(t.text)}</b>${progLabel(t)}${t.loc ? `<br><span class="g-loc">${esc(t.loc)}</span>` : ''}</div>`;
@@ -902,9 +1035,13 @@ function applyUI() {
   const w = ui.w ? Math.min(ui.w, max) : max;
   $('wid').value = w;
   root.setProperty('--maxw', w + 'px');
+  const sc = ui.scale || 100;
+  $('scl').value = sc;
+  document.querySelector('.wrap').style.zoom = sc / 100;
 }
 $('fsz').addEventListener('input', e => { ui.fs = +e.target.value; saveUI(); applyUI(); });
 $('wid').addEventListener('input', e => { ui.w = +e.target.value; saveUI(); applyUI(); });
+$('scl').addEventListener('input', e => { ui.scale = +e.target.value; saveUI(); applyUI(); });
 window.addEventListener('resize', applyUI);
 $('holTog').addEventListener('change', e => { ui.holidays = e.target.checked; saveUI(); render(); });
 
@@ -926,6 +1063,7 @@ function openDlg(todo, pos) {
   $('fLoc').value = t.loc || '';
   $('fNote').value = t.note || '';
   $('fProg').value = t.prog ?? '';
+  $('fImp').checked = !!t.imp;
   $('fStart').value = t.start;
   $('fEnd').value = t.end;
   $('fSt').value = t.st || '';
@@ -1058,6 +1196,17 @@ $('vList').addEventListener('click', e => {
   const dn = e.target.closest('[data-down]');
   if (dn) moveVis(dn.dataset.down, 1);
 });
+function setAllVis(on) {
+  vOrder.forEach(x => { x.show = on; });
+  $('vList').querySelectorAll('[data-show]').forEach(b => { b.checked = on; });
+}
+$('vAll').onclick = () => setAllVis(true);
+$('vNone').onclick = () => setAllVis(false);
+function setAllPrintRows(on) {
+  $('pRows').querySelectorAll('input[type=checkbox]').forEach(b => { b.checked = on; });
+}
+$('pAll').onclick = () => setAllPrintRows(true);
+$('pNone').onclick = () => setAllPrintRows(false);
 function closeVis() { $('vmask').hidden = true; }
 
 function openPrint() {
@@ -1070,21 +1219,48 @@ function openPrint() {
 }
 function closePrint() { $('pmask').hidden = true; }
 
+/* 列印：嵌在 claude.ai 的 artifact 裡 window.print() 可能沒有反應，改存成可獨立開啟的 HTML 檔 */
+/* 標頭：列印時置中顯示所選的列名，複選以「、」區隔 */
+function pheadHTML(rs) {
+  return `<div class="phead">${esc(rs.map(r => r.name).join('、'))}</div>`;
+}
+
+/* 文件標題也改為所選列名，瀏覽器列印的頁首會用到它，不再顯示「狂工曆」 */
+function printOut(names) {
+  if (window.self === window.top) {
+    const prev = document.title;
+    document.title = names;
+    window.print();
+    document.title = prev;
+    return;
+  }
+  printAsFile(names);
+}
+async function printAsFile(names = '列印') {
+  const css = [...document.querySelectorAll('style')].map(x => x.textContent).join('\n');
+  const body = $('print').innerHTML;
+  const html = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(names)}</title><style>${css}</style><style>#print{display:block}.noprint{margin:12px 16px}@media print{.noprint{display:none}}</style></head><body><button class="noprint" onclick="window.print()">列印</button><div id="print" class="${$('print').className}">${body}</div><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),400));<\/script></body></html>`;
+  const fname = names.replace(/[\\/:*?"<>|]/g, '_').slice(0, 80) || '列印';
+  const ok = await saveFile(`${fname}-${toISO(new Date())}.html`, html, 'text/html;charset=utf-8');
+  if (ok) uiMsg('已下載列印檔。打開後會自動跳出列印視窗；若沒有，按檔案內的「列印」按鈕。');
+}
+
 function doPrint() {
+  $('print').classList.toggle('noimp', !$('pImp').checked);
   const ids = [...$('pRows').querySelectorAll('input:checked')].map(i => i.value);
   if (!ids.length) return;
   if (!$('pFrom').value || !$('pTo').value) return;
   const from = monthStart($('pFrom').value), to = monthEnd($('pTo').value);
-  if (to < from) { alert('結束月份要晚於或等於開始月份'); return; }
+  if (to < from) { uiMsg('結束月份要晚於或等於開始月份'); return; }
   const rows = flatRows(true).filter(r => ids.includes(r.id));
   const isIn = d => d >= from && d <= to;
   const weeks = [];
   for (let w = mondayOf(from); w <= to; w = addDays(w, 7)) weeks.push(w);
 
   if ($('pLayout').value === 'gantt') {
-    $('print').innerHTML = ganttPrintHTML(from, to, rows);
+    $('print').innerHTML = pheadHTML(rows) + ganttPrintHTML(from, to, rows);
     closePrint();
-    window.print();
+    printOut(rows.map(r => r.name).join('、'));
     return;
   }
   const pNotes = $('pNotes').value;
@@ -1113,23 +1289,54 @@ function doPrint() {
     html = `<div class="ptitle">${title}</div>${notesOf([...yearKeys, ...periodKeysIn(from, to)])}<div class="board"><table class="ptable"><thead><tr><td>${headHTML}</td></tr></thead><tbody>${body}</tbody></table></div>`;
   }
   if (pNotes !== 'none') html += endNotesHTML(ids, from, to, pNotes === 'pos');
-  $('print').innerHTML = html;
+  $('print').innerHTML = pheadHTML(rows) + html;
   closePrint();
-  window.print();
+  printOut(rows.map(r => r.name).join('、'));
 }
 
 /* 甘特圖列印：每頁兩個 12 天區塊並排（每天 30 像素，A4 橫向剛好放下），列往下排，超過高度就接到下一頁 */
 function ganttPrintHTML(from, to, rows) {
-  const DW = 30, BD = 12, LW = 120, LIMIT = 660, LANE = 34;
+  const DW = 38, BD = 24, LW = 120, LIMIT = 660, LANE = 34;
   const days = [];
   for (let d = new Date(from); d <= to; d = addDays(d, 1)) days.push(new Date(d));
   const chunks = [];
   for (let i = 0; i < days.length; i += BD) chunks.push(days.slice(i, i + BD));
+  /* 編號：每列各自從 1 開始，依開始日排序；同一事件在同一列只有一個號碼 */
+  const numMap = new Map();
+  rows.forEach(row => {
+    data.todos
+      .filter(t => t.rows.includes(row.id) && t.end >= toISO(from) && t.start <= toISO(to))
+      .sort((a, b) => a.start.localeCompare(b.start) || b.end.localeCompare(a.end))
+      .forEach((t, i) => numMap.set(row.id + '|' + t.id, i + 1));
+  });
+  const calloutText = t => `${t.st ? t.st + ' ' : ''}${t.text}${t.loc ? ' · ' + t.loc : ''}${t.note ? '　' + t.note.replace(/\n/g, ' ') : ''}`;
+  /* 說明文字放在該列軌道下方，左端對齊事件條的起點；同一行放不下時往下一行排，不畫線 */
+  const placeCallouts = (segs, W) => {
+    const lines = [], items = [];
+    [...segs].sort((a, b) => a.cs - b.cs).forEach(sg => {
+      const txt = calloutText(sg.t);
+      const natural = [...txt].length * 12 + 22;
+      /* 寬度盡量一行放完；靠右的項目往左靠，讓整段文字不會被切成細長的直欄 */
+      const width = Math.min(natural, W);
+      const left = Math.min(sg.cs * DW, W - width);
+      const h = Math.ceil(natural / width) * 16 + 2;
+      let li = lines.findIndex(L => L.right <= left);
+      if (li < 0) { lines.push({ right: 0, h: 0 }); li = lines.length - 1; }
+      lines[li].right = left + width + 8;
+      lines[li].h = Math.max(lines[li].h, h);
+      items.push({ sg, txt, left, width, li });
+    });
+    const tops = [];
+    lines.reduce((acc, L, k) => { tops[k] = acc; return acc + L.h; }, 0);
+    const h = lines.reduce((a, L) => a + L.h, 0);
+    items.forEach(it => { it.top = tops[it.li]; });
+    return { items, h };
+  };
   const layout = (row, ch) => {
     const cfrom = toISO(ch[0]), cto = toISO(ch[ch.length - 1]);
     const segs = data.todos
       .filter(t => t.rows.includes(row.id) && t.end >= cfrom && t.start <= cto)
-      .map(t => ({ t, cs: Math.round((parse(t.start > cfrom ? t.start : cfrom) - ch[0]) / DAY_MS), ce: Math.round((parse(t.end < cto ? t.end : cto) - ch[0]) / DAY_MS) + 1 }))
+      .map(t => ({ t, n: numMap.get(row.id + '|' + t.id), cs: Math.round((parse(t.start > cfrom ? t.start : cfrom) - ch[0]) / DAY_MS), ce: Math.round((parse(t.end < cto ? t.end : cto) - ch[0]) / DAY_MS) + 1 }))
       .sort((a, b) => a.cs - b.cs || b.ce - a.ce);
     const lanesEnd = [];
     segs.forEach(sg => {
@@ -1138,7 +1345,7 @@ function ganttPrintHTML(from, to, rows) {
       lanesEnd[l] = sg.ce;
       sg.lane = l;
     });
-    return { h: Math.max(1, lanesEnd.length) * LANE + 8, segs };
+    return { h: Math.max(1, lanesEnd.length) * LANE + 8, segs, cal: placeCallouts(segs, ch.length * DW) };
   };
   const header = ch => {
     let months = '';
@@ -1149,33 +1356,37 @@ function ganttPrintHTML(from, to, rows) {
       months += `<div class="g-month" style="width:${mw}px">${mlabel}</div>`;
       i = j;
     }
-    const dh = ch.map(d => `<div class="g-day${d.getDay() === 0 || d.getDay() === 6 ? ' we' : ''}${holidayOf(toISO(d)) ? ' hol' : ''}">${d.getDate()}</div>`).join('');
+    const dh = ch.map(d => `<div class="g-day${d.getDay() === 0 || d.getDay() === 6 || holidayOf(toISO(d)) ? ' we' : ''}${holidayOf(toISO(d)) ? ' hol' : ''}">${d.getDate()}</div>`).join('');
     return `<div class="g-hrow"><div class="g-corner"></div><div class="g-months" style="width:${ch.length * DW}px">${months}</div></div>`
       + `<div class="g-hrow"><div class="g-corner"></div><div class="g-days" style="width:${ch.length * DW}px">${dh}</div></div>`;
   };
-  const block = (ch, idxs, heights, layouts) => {
-    if (!ch) return `<div class="gblock" style="width:${LW + BD * DW}px"></div>`;
+  const block = (ch, idxs, layouts, laneMax, calMax) => {
     let html = `<div class="gblock">${header(ch)}`;
     idxs.forEach(i => {
-      const row = rows[i], c = row.color, h = heights[i], lay = layouts[i];
+      const row = rows[i], c = row.color, lay = layouts[i], W = ch.length * DW;
       const cells = ch.map((d, k) => {
         const we = d.getDay() === 0 || d.getDay() === 6;
-        return `<div class="cell g-cell" style="left:${k * DW}px;width:${DW}px;background:${c}${we ? '26' : '12'}"></div>`;
+        return `<div class="cell g-cell" style="left:${k * DW}px;width:${DW}px;background:${c}${(we || holidayOf(toISO(d))) ? '26' : '12'}"></div>`;
       }).join('');
-      const bars = lay.segs.map(({ t, cs, ce, lane }) =>
-        `<div class="bar g-bar" style="left:${cs * DW + 2}px;width:${(ce - cs) * DW - 4}px;top:${lane * LANE + 4}px;background:${c}59;border-left-color:${c}">${progFill(t, c)}<span class="g-txt">${t.st ? `<span class="tm">${esc(t.st)}</span> ` : ''}${esc(t.text)}${progLabel(t)}</span></div>`).join('');
-      html += `<div class="g-row"><div class="g-label${row.depth ? ' sub' : ''}" style="background:${c}30;padding-left:${6 + row.depth * 8}px">${esc(row.name)}</div><div class="g-track" style="width:${ch.length * DW}px;height:${h}px">${cells}${bars}</div></div>`;
+      const bars = lay.segs.map(({ t, cs, ce, lane, n }) =>
+        `<div class="bar g-bar" style="left:${cs * DW + 2}px;width:${(ce - cs) * DW - 4}px;top:${lane * LANE + 4}px;background:${c}59;border-left-color:${c}">${progFill(t, c)}<span class="g-txt${t.imp ? ' imp' : ''}"><span class="gnum">${n}</span>${t.st ? `<span class="tm">${esc(t.st)}</span> ` : ''}${esc(t.text)}${progLabel(t)}</span></div>`).join('');
+      const calls = lay.cal.items.map(o =>
+        `<div class="gcall-i${o.sg.t.imp ? ' imp' : ''}" style="left:${o.left}px;top:${o.top}px;width:${o.width}px"><span class="gnum">${o.sg.n}</span>${esc(o.txt)}</div>`).join('');
+      const callBox = calMax[i] ? `<div class="g-calls" style="width:${W}px;height:${calMax[i]}px">${calls}</div>` : '';
+      html += `<div class="g-row"><div class="g-label${row.depth ? ' sub' : ''}" style="background:${c}30;padding-left:${6 + row.depth * 8}px">${esc(row.name)}</div><div class="g-rowbody" style="width:${W}px"><div class="g-track" style="width:${W}px;height:${laneMax[i]}px">${cells}${bars}</div>${callBox}</div></div>`;
     });
     return html + '</div>';
   };
   /* 先依時段組合產生多組區塊（bands），再依頁面高度堆疊到頁面中，填滿後才換頁 */
   const HEAD_H = 62;
   const bands = [];
-  for (let k = 0; k < chunks.length; k += 2) {
-    const L = chunks[k], R = k + 1 < chunks.length ? chunks[k + 1] : null;
+  for (let k = 0; k < chunks.length; k += 1) {
+    const L = chunks[k], R = null;
     const layL = rows.map(r => layout(r, L));
     const layR = R ? rows.map(r => layout(r, R)) : null;
-    const heights = rows.map((_, i) => Math.max(layL[i].h, R ? layR[i].h : 0));
+    const laneMax = rows.map((_, i) => Math.max(layL[i].h, R ? layR[i].h : 0));
+    const calMax = rows.map((_, i) => Math.max(layL[i].cal.h, R ? layR[i].cal.h : 0));
+    const heights = rows.map((_, i) => laneMax[i] + (calMax[i] ? calMax[i] + 4 : 0));
     const layoutsR = rows.map((_, i) => (R ? layR[i] : null));
     const slices = [];
     let cur = [], acc = 0;
@@ -1186,7 +1397,7 @@ function ganttPrintHTML(from, to, rows) {
     if (cur.length || !rows.length) slices.push(cur);
     slices.forEach(idxs => {
       const h = HEAD_H + idxs.reduce((sum, i) => sum + heights[i], 0) + 14;
-      const html = `<div class="gpair">${block(L, idxs, heights, rows.map((_, i) => layL[i]))}${R ? block(R, idxs, heights, layoutsR) : block(null, idxs, heights, layoutsR)}</div>`;
+      const html = `<div class="gpair">${block(L, idxs, layL, laneMax, calMax)}</div>`;
       bands.push({ h, html });
     });
   }
@@ -1203,15 +1414,25 @@ function ganttPrintHTML(from, to, rows) {
   return out;
 }
 
-function exportJSON() {
-  const out = { format: FORMAT, version: 3, exportedAt: new Date().toISOString(), rows: data.rows, todos: data.todos, customHolidays: data.customHolidays, notes: data.notes };
-  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+/* 檔案下載：有 downloads 能力時走 claude.use('downloads')，否則用一般下載連結 */
+let dl = undefined;
+async function saveFile(filename, text, mime) {
+  if (dl === undefined) { try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; } }
+  if (dl) {
+    try { await dl.save({ filename, data: text }); return true; } catch (e) { if (e && e.code === 'declined') return false; }
+  }
+  const blob = new Blob([text], { type: mime });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `行事曆-${toISO(new Date())}.json`;
+  a.download = filename;
   a.click();
-  ui.lastExport = Date.now(); saveUI(); updateBk();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  return true;
+}
+async function exportJSON() {
+  const out = { format: FORMAT, version: 3, exportedAt: new Date().toISOString(), rows: data.rows, todos: data.todos, customHolidays: data.customHolidays, notes: data.notes };
+  await saveFile(`行事曆-${toISO(new Date())}.json`, JSON.stringify(out, null, 2), 'application/json');
+  ui.lastExport = Date.now(); saveUI(); updateBk();
 }
 
 /* ---------- ICS 匯出（可匯入 Google 日曆） ---------- */
@@ -1272,12 +1493,7 @@ function exportICS(ids) {
   }
   lines.push('END:VCALENDAR');
   const body = lines.map(icsFold).join('\r\n') + '\r\n';
-  const blob = new Blob([body], { type: 'text/calendar;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `行事曆-${toISO(new Date())}.ics`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  saveFile(`行事曆-${toISO(new Date())}.ics`, body, 'text/calendar;charset=utf-8');
 }
 
 function openIcsExport() {
@@ -1412,18 +1628,78 @@ $('iform').addEventListener('submit', e => {
 $('iCancel').onclick = closeImport;
 $('imask').addEventListener('mousedown', e => { if (e.target === $('imask')) closeImport(); });
 
+/* 頁內對話框：瀏覽器的 alert/confirm 在 artifact 框架中可能被擋，改用頁內方塊 */
+function uiMsg(msg, withCancel) {
+  return new Promise(resolve => {
+    const wrap = document.createElement('div');
+    wrap.className = 'mask';
+    wrap.style.zIndex = '300';
+    const box = document.createElement('div');
+    box.className = 'dlg';
+    const text = document.createElement('div');
+    text.textContent = msg;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;justify-content:flex-end';
+    const ok = document.createElement('button');
+    ok.className = 'primary';
+    ok.textContent = '確定';
+    row.append(ok);
+    let no = null;
+    if (withCancel) { no = document.createElement('button'); no.textContent = '取消'; row.prepend(no); }
+    box.append(text, row);
+    wrap.append(box);
+    document.body.append(wrap);
+    const done = v => { wrap.remove(); resolve(v); };
+    ok.onclick = () => done(true);
+    if (no) no.onclick = () => done(false);
+    ok.focus();
+  });
+}
+
+/* 頁內選擇框：回傳被按下的選項（以索引表示），取消則為 -1 */
+function uiChoose(msg, labels) {
+  return new Promise(resolve => {
+    const wrap = document.createElement('div');
+    wrap.className = 'mask';
+    wrap.style.zIndex = '300';
+    const box = document.createElement('div');
+    box.className = 'dlg';
+    const text = document.createElement('div');
+    text.textContent = msg;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end';
+    const done = v => { wrap.remove(); resolve(v); };
+    labels.forEach((l, i) => {
+      const b = document.createElement('button');
+      if (i === 0) b.className = 'primary';
+      b.textContent = l;
+      b.onclick = () => done(i);
+      row.append(b);
+    });
+    const cancel = document.createElement('button');
+    cancel.textContent = '取消';
+    cancel.onclick = () => done(-1);
+    row.append(cancel);
+    box.append(text, row);
+    wrap.append(box);
+    document.body.append(wrap);
+  });
+}
+
 /* ---------- JSON 匯入 ---------- */
 
 async function importFile(file) {
   const text = await file.text();
   if (/BEGIN:VCALENDAR/i.test(text)) { openIcs(text); return; }
   let obj;
-  try { obj = JSON.parse(text); } catch (e) { alert('檔案無法讀取'); return; }
+  try { obj = JSON.parse(text); } catch (e) { uiMsg('檔案無法讀取'); return; }
   if (!obj || obj.format !== FORMAT || !Array.isArray(obj.rows) || !Array.isArray(obj.todos)) {
-    alert('這不是可辨識的行事曆檔案');
+    uiMsg('這不是可辨識的行事曆檔案');
     return;
   }
-  if (!confirm('以此檔取代目前的資料？')) return;
+  const pick = await uiChoose('要如何匯入這個檔案？', ['取代全部資料', '合併加入現有資料']);
+  if (pick < 0) return;
+  const mode = pick === 0 ? 'replace' : 'merge';
   const rows = obj.rows
     .filter(r => r && r.id && r.name)
     .map((r, i) => ({
@@ -1450,13 +1726,56 @@ async function importFile(file) {
       loc: t.loc ? String(t.loc) : '',
       note: t.note ? String(t.note) : '',
       prog: (t.prog !== '' && t.prog !== null && Number.isFinite(+t.prog)) ? Math.min(100, Math.max(0, Math.round(+t.prog))) : undefined,
+      imp: !!t.imp,
       src: t.src ? String(t.src) : undefined
     }));
   const notes = Array.isArray(obj.notes)
     ? obj.notes.filter(n => n && n.id && n.text && ['all', 'row', 'period'].includes(n.scope))
       .map(n => ({ id: String(n.id), text: String(n.text), scope: n.scope, target: n.target ? String(n.target) : '' }))
     : [];
-  data = { rows, todos, customHolidays: (obj.customHolidays && typeof obj.customHolidays === 'object') ? obj.customHolidays : {}, notes };
+  const customHolidays = (obj.customHolidays && typeof obj.customHolidays === 'object') ? obj.customHolidays : {};
+  if (mode === 'merge') {
+    /* 同名列（名稱完全相同）不新增，改為「更新」或「取代」該列的事件；其餘列照常新增 */
+    const byName = new Map(data.rows.map(r => [r.name, r.id]));
+    const matched = rows.filter(r => byName.has(r.name));
+    let strategy = 'update';
+    if (matched.length) {
+      const k = await uiChoose(`發現同名列：${matched.map(r => r.name).join('、')}。同名列要如何處理？`, ['更新：保留原有事件，加入新的', '取代：清除該列原有事件，改用匯入的']);
+      if (k < 0) return;
+      strategy = k === 0 ? 'update' : 'replace';
+    }
+    const rmap = new Map();
+    const newRows = [];
+    rows.forEach(r => {
+      if (byName.has(r.name)) { rmap.set(r.id, byName.get(r.name)); return; }
+      const nid = uid();
+      rmap.set(r.id, nid);
+      newRows.push({ ...r, id: nid });
+    });
+    newRows.forEach(r => { if (r.parent) r.parent = rmap.get(r.parent) || null; });
+    const sameIds = new Set(matched.map(r => rmap.get(r.id)));
+    if (strategy === 'replace' && sameIds.size) {
+      data.todos = data.todos
+        .map(t => ({ ...t, rows: t.rows.filter(x => !sameIds.has(x)) }))
+        .filter(t => t.rows.length);
+    }
+    /* 同一列、同日期、同文字的事件視為相同，不重複加入 */
+    const keyOf = t => `${t.rows.slice().sort().join(',')}|${t.start}|${t.end}|${t.text}`;
+    const existing = new Set(data.todos.map(keyOf));
+    const newTodos = todos
+      .map(t => ({ ...t, id: uid(), rows: t.rows.map(x => rmap.get(x)).filter(Boolean) }))
+      .filter(t => t.rows.length)
+      .filter(t => !existing.has(keyOf(t)));
+    const newNotes = notes
+      .map(n => ({ ...n, id: uid(), target: n.scope === 'row' ? (rmap.get(n.target) || '') : n.target }))
+      .filter(n => n.scope !== 'row' || n.target);
+    data.rows = [...data.rows, ...newRows];
+    data.todos = [...data.todos, ...newTodos];
+    data.notes = [...data.notes, ...newNotes];
+    data.customHolidays = { ...data.customHolidays, ...customHolidays };
+  } else {
+    data = { rows, todos, customHolidays, notes };
+  }
   save(); render();
 }
 
@@ -1473,13 +1792,14 @@ $('form').addEventListener('submit', e => {
   const progRaw = $('fProg').value;
   const prog = progRaw === '' ? undefined : Math.min(100, Math.max(0, Math.round(+progRaw)));
   const rowsSel = [...$('fRows').querySelectorAll('input:checked')].map(i => i.value);
-  if (!rowsSel.length) { alert('請至少選擇一列'); return; }
+  if (!rowsSel.length) { uiMsg('請至少選擇一列'); return; }
   const st = $('fSt').value, et = $('fEt').value;
+  const imp = $('fImp').checked;
   if (editingId) {
     const t = data.todos.find(x => x.id === editingId);
-    if (t) Object.assign(t, { text, loc, note, prog, start: s, end: en, rows: rowsSel, st, et });
+    if (t) Object.assign(t, { text, loc, note, prog, start: s, end: en, rows: rowsSel, st, et, imp });
   } else {
-    data.todos.push({ id: uid(), rows: rowsSel, start: s, end: en, text, loc, note, prog, st, et });
+    data.todos.push({ id: uid(), rows: rowsSel, start: s, end: en, text, loc, note, prog, st, et, imp });
   }
   save(); closeDlg(); render();
 });
@@ -1519,7 +1839,7 @@ $('rColors').addEventListener('click', e => {
 
 $('rCancel').onclick = closeRowDlg;
 $('rAddChild').onclick = () => { const pid = rowEdit.id; closeRowDlg(); openRowDlg(null, pid); };
-$('rDel').onclick = () => {
+$('rDel').onclick = async () => {
   const r = data.rows.find(x => x.id === rowEdit.id);
   if (!r) return;
   const ids = descIds(r.id);
@@ -1527,7 +1847,7 @@ $('rDel').onclick = () => {
   const msg = ids.length > 1
     ? `刪除「${r.name}」及其下 ${ids.length - 1} 個子列，共 ${nTodo} 個事項？`
     : `刪除「${r.name}」以及這列的 ${nTodo} 個事項？`;
-  if (!confirm(msg)) return;
+  if (!(await uiMsg(msg, true))) return;
   data.rows = data.rows.filter(x => !ids.includes(x.id));
   data.todos.forEach(t => { t.rows = t.rows.filter(x => !ids.includes(x)); });
   data.todos = data.todos.filter(t => t.rows.length);
@@ -1702,6 +2022,9 @@ applyUI();
 updateBk();
 bindGanttScroll();
 render();
+initCloud();
 </script>
 </body>
 </html>
+
+</body></html>
